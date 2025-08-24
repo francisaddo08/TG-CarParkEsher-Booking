@@ -1,6 +1,6 @@
-﻿namespace TG.CarParkEsher.Booking.HostingExtensions
+﻿namespace TG.CarParkEsher.Booking
 {
-    public static  class HostingExtensions
+    public static  class HostingExtension
     {
        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
