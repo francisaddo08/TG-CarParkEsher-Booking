@@ -3,16 +3,6 @@ using System.Globalization;
 
 namespace TG.CarParkEsher.Booking
 {
-    internal record EsherCarParkDayInfo( string DayName, int DayNumber, DateTime DateValue);
-    public static class DateTimeExtensions
-    {
-        public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
-        {
-            int d = dt.DayOfWeek - startOfWeek;
-            int diff = (7 + (dt.DayOfWeek - startOfWeek)) % 7;
-            return dt.AddDays(-1 * diff).Date;
-        }
-    }
     internal sealed class CalenderWorkerService : BackgroundService
     {
         private readonly ILogger<CalenderWorkerService> _logger;
