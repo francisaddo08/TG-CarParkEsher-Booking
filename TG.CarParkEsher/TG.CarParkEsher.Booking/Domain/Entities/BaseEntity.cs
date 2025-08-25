@@ -1,13 +1,13 @@
 ﻿namespace TG.CarParkEsher.Booking
 {
-    public class BaseEntity<T>
+    internal abstract class BaseEntity<T>
     {
-     public T Id { get; set; }
-        public BaseEntity()
+     internal T Id { get; set; }
+        protected internal BaseEntity()
         {
             Id = default!;
         }
-        public BaseEntity(T id)
+        protected internal BaseEntity(T id)
         {
             Id = id;
         }

@@ -18,7 +18,9 @@ namespace TG.CarParkEsher.Booking
             var connectionString = _connectionOption.CurrentValue.ConnectionString;
             if (string.IsNullOrWhiteSpace(connectionString))
             {
+                _logger.LogError("Connection string is not configured.");
                 throw new InvalidOperationException("Connection string is not configured.");
+                
             }
             var connection = new SqliteConnection(connectionString);
           

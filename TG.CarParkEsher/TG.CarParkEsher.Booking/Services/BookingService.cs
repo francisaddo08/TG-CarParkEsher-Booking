@@ -1,6 +1,10 @@
 ﻿namespace TG.CarParkEsher.Booking.HostingExtensions
 {
-    internal class BookingService
+    internal sealed class BookingService
     {
+        
+        
+     
+        // Add methods to handle booking logic here
     }
 }
