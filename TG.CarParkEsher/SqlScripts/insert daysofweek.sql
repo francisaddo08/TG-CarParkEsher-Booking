@@ -1,0 +1,2 @@
+INSERT INTO daysofweek(dayname,daynumber,datevalue) VALUES("Friday",5,datetime('now','4 day','localtime'))
+                                                    --("Tuesday",2,datetime('now','1 day','localtime')),

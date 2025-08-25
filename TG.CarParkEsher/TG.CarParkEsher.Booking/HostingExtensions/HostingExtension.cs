@@ -7,6 +7,7 @@ namespace TG.CarParkEsher.Booking
        internal static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddSingleton<EmployeeRepository>();
+            services.AddHostedService<CalenderWorkerService>();
             //services.AddScoped<IBookingService, BookingService>();
             //services.AddScoped<IBookingRepository, BookingRepository>();
             //services.AddScoped<IUserRepository, UserRepository>();

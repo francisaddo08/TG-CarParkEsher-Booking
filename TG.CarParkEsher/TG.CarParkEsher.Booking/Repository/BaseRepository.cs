@@ -5,7 +5,7 @@ namespace TG.CarParkEsher.Booking
 {
     internal abstract class BaseRepository
     {
-        private readonly ILogger<BaseRepository> _logger;
+        protected readonly ILogger<BaseRepository> _logger;
         private readonly IOptionsMonitor<ConnectionOption> _connectionOption;
 
         protected BaseRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption)
