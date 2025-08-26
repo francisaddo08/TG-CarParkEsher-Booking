@@ -20,6 +20,11 @@ namespace TG.CarParkEsher.Booking
               valid = false;
                 errors.Add(new ErrorDto { ErrorID = "InvalidDate", ErrorDetail = "The booking date must be today or in the future." });
             }
+            if (esherCarParkBookingRequestDto.ParkingSpaceId <= 0)
+            {
+                valid = false;
+                errors.Add(new ErrorDto { ErrorID = "InvalidParkingSpaceId", ErrorDetail = "Parking Space ID must be a positive integer." });
+            }
             errors = errors.Any() ? errors : null;
             return new EsherCarParkBookingResponseDto(valid, errors, esherCarParkBookingRequestDto.ParkingSpaceId, esherCarParkBookingRequestDto.DateBooked);
 

@@ -2,7 +2,9 @@
 {
     internal sealed class EsherCarParkBookingRequestDto
     {
-        internal  int  ParkingSpaceId { get; set; } 
+        
+        internal  int  ParkingSpaceId { get; set; }
+        internal int ParkingStructureId { get; set; }
         internal DateTime DateBooked { get; set; }
 
     }

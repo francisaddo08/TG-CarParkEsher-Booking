@@ -1,38 +1,61 @@
 ﻿using CSharpFunctionalExtensions;
-using TG.CarParkEsher.Booking.Services.Result;
+
 
 namespace TG.CarParkEsher.Booking.HostingExtensions
 {
     internal sealed class BookingService
     {
-     private readonly IBookingRepository _bookingRepository;
-        public BookingService(IBookingRepository bookingRepository)
+        private readonly IBookingRepository _bookingRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly int _defaultParkingStructureId = 1;
+        public BookingService(IBookingRepository bookingRepository, IHttpContextAccessor httpContextAccessor)
         {
             _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
-        public async Task<ContextResult<EsherCarParkBookingResponseDto>> BookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken)
+        public async Task<ContextResult<EsherCarParkBookingResponseDto>> CreateBookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken)
         {
-            var bookingResponse = EsherCarParkBookingResponseDto.Create(bookingRequest);
-            if (!bookingResponse.Valid)
+            var esherCarParkBookingResponse = EsherCarParkBookingResponseDto.Create(bookingRequest);
+            if (!esherCarParkBookingResponse.Valid)
             {
-                return ContextResult<EsherCarParkBookingResponseDto>.Failure(bookingResponse);
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
             }
-            try
+            var bookingForCreate = await NewBookingAsync(bookingRequest);
+            if (bookingForCreate.IsFailure || bookingForCreate.Value is null)
             {
-                //var isBooked = await _bookingRepository.BookSlotAsync(bookingRequest.ParkingSpaceId, bookingRequest.DateBooked, cancellationToken);
-                //if (!isBooked)
-                //{
-                //    return ContextResult<EsherCarParkBookingResponseDto>.Failure("The parking space is already booked for the selected date.");
-                //}
-                return ContextResult<EsherCarParkBookingResponseDto>.Success(bookingResponse);
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure(bookingForCreate.Error, true);
             }
-            catch (Exception ex)
+            var createdBooking = await CreateBookingAsync(bookingForCreate.Value, cancellationToken);
+            if (createdBooking is null)
             {
-                // Log the exception (not implemented here)
-                return ContextResult<EsherCarParkBookingResponseDto>.Failure("An error occurred while processing your booking request.", true);
+                var errors = new List<ErrorDto>()
+                { 
+                  new ErrorDto { ErrorID = "BookingCreationFailed", ErrorDetail = "An error occurred while creating the booking. Please try again later." }
+                };
+                esherCarParkBookingResponse.SetValidation(false, errors );
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse, true);
             }
 
+            return ContextResult<EsherCarParkBookingResponseDto>.Success(esherCarParkBookingResponse);
         }
+        private async Task<Result<Booking>> NewBookingAsync(EsherCarParkBookingRequestDto bookingRequest)
+        {
+
+            return Booking.Create(1, bookingRequest.DateBooked, bookingRequest.ParkingSpaceId, _defaultParkingStructureId);
+
+        }
+        private async Task<Booking?> CreateBookingAsync(Booking bookingForCreate, CancellationToken cancellationToken)
+        {
+            Booking? booking = null;
+            var bookingResult = await _bookingRepository.CreateBookingAsync(bookingForCreate, cancellationToken);
+            if (bookingResult.IsSuccess && bookingResult.Value is not null)
+            {
+                booking = bookingResult.Value;
+            }
+            return booking;
+
+        }
+
 
     }
 }

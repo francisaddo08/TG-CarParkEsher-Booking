@@ -8,7 +8,70 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
         public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
-       internal async Task<bool>  UpdateDaysOfWeek()
+        public async Task<Result<Booking?>> CreateBookingAsync(Booking bookingForCreate, CancellationToken cancellationToken)
+        {
+           Booking? booking = null;
+            try
+            {
+                using (var connection = GetConnection())
+                {
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                    using (var transaction = connection.BeginTransaction())
+                    {
+
+                        var command = connection.CreateCommand();
+                       
+
+                        command.CommandText = @"INSERT INTO bookig (bookee_id, dateofbooking, datebooked, parkingspace_id, parkingstructure_id) 
+                                                VALUES ($bookeeid, $dateofbooking, $datebooked, $parkingspaceid, $parkingstructureid)";
+                        var bookeeIdParam = command.CreateParameter();
+                        bookeeIdParam.ParameterName = "$bookeeid";
+                        command.Parameters.Add(bookeeIdParam);
+                        var dateOfBookingParam = command.CreateParameter();
+                        dateOfBookingParam.ParameterName = "$dateofbooking";
+                        command.Parameters.Add(dateOfBookingParam);
+                        var dateBookedParam = command.CreateParameter();
+                        dateBookedParam.ParameterName = "$datebooked";
+                        command.Parameters.Add(dateBookedParam);
+                        var parkingSpaceIdParam = command.CreateParameter();
+                        parkingSpaceIdParam.ParameterName = "$parkingspaceid";
+                        command.Parameters.Add(parkingSpaceIdParam);
+                        var parkingStructureIdParam = command.CreateParameter();
+                        parkingStructureIdParam.ParameterName = "$parkingstructureid";
+                        command.Parameters.Add(parkingStructureIdParam);
+
+                        bookeeIdParam.Value = bookingForCreate.BookeeId;
+                        dateOfBookingParam.Value = DateTime.UtcNow;
+                        dateBookedParam.Value = bookingForCreate.DateBooked;
+                        parkingSpaceIdParam.Value = bookingForCreate.ParkingSpaceId;
+                        parkingStructureIdParam.Value = bookingForCreate.ParkingStructureId;
+                        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+
+
+
+                        //var lastInsertIdCommand = connection.CreateCommand();
+                        //lastInsertIdCommand.CommandText = @"WITH lastid AS (SELECT last_insert_rowid()) 
+                        //                                    SELECT bookingid, bookee_id, datebooked, parkingspace_id, parkingstructure_id
+                        //                                    FROM booking
+                        //                                    WHERE bookingid = lastid";
+
+                        //var lastInsertId =  await lastInsertIdCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+
+                        transaction.Commit();
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return Result.Failure<Booking?>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
+            }
+            return Result.Success<Booking?>(booking);
+
+        }
+        internal async Task<bool>  UpdateDaysOfWeek()
         {
             try
             {
@@ -59,5 +122,7 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
             }
             return Result.Success(availableSlots);
         }
+
+       
     }
 }

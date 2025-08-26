@@ -1,4 +1,4 @@
-﻿namespace TG.CarParkEsher.Booking.Services.Result
+﻿namespace TG.CarParkEsher.Booking
 {
     internal sealed class ContextResult<T> where T : class
     {
