@@ -8,14 +8,59 @@ namespace TG.CarParkEsher.Booking
         public CalenderRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
-        public async Task<Result<List<EsherCarParkDayInfo>>> GetDaysOfWeek(CancellationToken cancellationToken)
+        public async Task<Result<bool>> UpdateDaysOfWeek(HashSet<EsherCarParkDayInfo> esherCarParkDayInfos, CancellationToken cancellationToken)
         {
-            List<EsherCarParkDayInfo> daysOfWeek = new List<EsherCarParkDayInfo>();
+           
             try
             {
                 using (var connection = GetConnection())
                 {
-                    await connection.OpenAsync(cancellationToken);
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                       
+                        var command = connection.CreateCommand();
+                        command.CommandText = @"DELETE FROM daysofweek";
+                        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+
+                        command.CommandText = @"INSERT INTO daysofweek (dayname, daynumber, datevalue) VALUES ($dayname, $daynumber, $datevalue)";
+                        var dayNameParam = command.CreateParameter();
+                        dayNameParam.ParameterName = "$dayname";
+                        command.Parameters.Add(dayNameParam);
+                        var dayNumberParam = command.CreateParameter();
+                        dayNumberParam.ParameterName = "$daynumber";
+                        command.Parameters.Add(dayNumberParam);
+                        var dateValueParam = command.CreateParameter();
+                        dateValueParam.ParameterName = "$datevalue";
+                        command.Parameters.Add(dateValueParam);
+                        foreach (var dayInfo in esherCarParkDayInfos)
+                        {
+                            dayNameParam.Value = dayInfo.DayName;
+                            dayNumberParam.Value = dayInfo.DayNumber;
+                            dateValueParam.Value = dayInfo.DateValue;
+                            await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                        }
+                        transaction.Commit();
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return Result.Failure<bool>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
+            }
+            return Result.Success<bool>(true);
+        }
+        public async Task<Result<HashSet<EsherCarParkDayInfo>>> GetDaysOfWeek(CancellationToken cancellationToken)
+        {
+            HashSet<EsherCarParkDayInfo> daysOfWeek = new HashSet<EsherCarParkDayInfo>();
+            try
+            {
+                using (var connection = GetConnection())
+                {
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
                     var command = connection.CreateCommand();
                     command.CommandText = @"SELECT id, dayname, daynumber, datevalue FROM daysofweek ORDER BY daynumber";
                     using (var reader = await command.ExecuteReaderAsync())
@@ -36,9 +81,9 @@ namespace TG.CarParkEsher.Booking
             catch (Exception ex)
             {
 
-                return Result.Failure<List<EsherCarParkDayInfo>>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
+                return Result.Failure<HashSet<EsherCarParkDayInfo>>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
             }
-            return Result.Success<List<EsherCarParkDayInfo>>(daysOfWeek);
+            return Result.Success<HashSet<EsherCarParkDayInfo>>(daysOfWeek);
         }
 
     }

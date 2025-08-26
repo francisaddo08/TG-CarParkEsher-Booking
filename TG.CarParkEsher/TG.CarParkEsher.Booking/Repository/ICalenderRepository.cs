@@ -4,6 +4,7 @@ namespace TG.CarParkEsher.Booking
 {
     internal interface ICalenderRepository
     {
-        Task<Result<List<EsherCarParkDayInfo>>> GetDaysOfWeek(CancellationToken cancellationToken);
+        Task<Result<HashSet<EsherCarParkDayInfo>>> GetDaysOfWeek(CancellationToken cancellationToken);
+        Task<Result<bool>> UpdateDaysOfWeek(HashSet<EsherCarParkDayInfo> esherCarParkDayInfos, CancellationToken cancellationToken);
     }
 }

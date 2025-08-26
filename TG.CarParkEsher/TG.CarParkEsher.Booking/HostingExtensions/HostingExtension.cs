@@ -6,7 +6,7 @@ namespace TG.CarParkEsher.Booking
     {
         internal static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            
+            services.AddScoped<ICalenderService, CalenderService>();
             return services;
         }
         internal static IServiceCollection AddRepositories(this IServiceCollection services)
