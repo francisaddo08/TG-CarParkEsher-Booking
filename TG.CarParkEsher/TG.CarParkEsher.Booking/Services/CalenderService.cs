@@ -18,8 +18,6 @@ namespace TG.CarParkEsher.Booking
                 {
                     return Result.Failure<bool>($"Failed to retrieve days of the week: {result.Error}");
                 }
-
-                var existingDays = result.Value;
               
                 return Result.Success(true);
             }
