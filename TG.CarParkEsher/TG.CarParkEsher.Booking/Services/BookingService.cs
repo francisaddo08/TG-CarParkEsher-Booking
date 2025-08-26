@@ -10,25 +10,28 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
         {
             _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
         }
-        public async Task<ContextResult<bool>> BookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken)
+        public async Task<ContextResult<EsherCarParkBookingResponseDto>> BookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken)
         {
-          if (bookingRequest == null) 
-          {
-                return Result.Failure<bool>("Booking request cannot be null");
+            var bookingResponse = EsherCarParkBookingResponseDto.Create(bookingRequest);
+            if (!bookingResponse.Valid)
+            {
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure(bookingResponse);
             }
             try
             {
-                var result = await _bookingRepository.BookSlotAsync(bookingRequest, cancellationToken);
-                if (result.IsFailure)
-                {
-                    return Result.Failure<bool>($"Failed to book slot: {result.Error}");
-                }
-                return Result.Success(true);
+                //var isBooked = await _bookingRepository.BookSlotAsync(bookingRequest.ParkingSpaceId, bookingRequest.DateBooked, cancellationToken);
+                //if (!isBooked)
+                //{
+                //    return ContextResult<EsherCarParkBookingResponseDto>.Failure("The parking space is already booked for the selected date.");
+                //}
+                return ContextResult<EsherCarParkBookingResponseDto>.Success(bookingResponse);
             }
             catch (Exception ex)
             {
-                return Result.Failure<bool>($"An error occurred while booking slot. {ex.Message} {ex.InnerException?.Message}");
+                // Log the exception (not implemented here)
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure("An error occurred while processing your booking request.", true);
             }
+
         }
 
     }

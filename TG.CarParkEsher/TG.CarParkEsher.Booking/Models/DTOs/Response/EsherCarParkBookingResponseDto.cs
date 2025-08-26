@@ -2,26 +2,33 @@
 
 namespace TG.CarParkEsher.Booking
 {
-    internal sealed class EsherCarParkBookingResponseDto
+    internal sealed class EsherCarParkBookingResponseDto : RequestValidationResultDto
     {
-        private EsherCarParkBookingResponseDto(string parkingSpaceId, DateTime dateBooked, string? message)
+        private EsherCarParkBookingResponseDto(bool valid, IList<ErrorDto>? errors, int parkingSpaceId, DateTime dateBooked)
+            : base(valid, errors)
         {
-            Message = message;
             ParkingSpaceId = parkingSpaceId;
             DateBooked = dateBooked;
         }
-        internal static Result<EsherCarParkBookingResponseDto> Create(int parkingSpaceId, DateTime dateBooked, string? message)
+
+        internal static EsherCarParkBookingResponseDto Create(EsherCarParkBookingRequestDto esherCarParkBookingRequestDto)
         {
-            if (parkingSpaceId < 1 || parkingSpaceId > 35)
+            var valid = true;
+            var errors = new List<ErrorDto>();
+            if (!IsValidDate(esherCarParkBookingRequestDto.DateBooked))
             {
-                return Result.Failure<EsherCarParkBookingResponseDto>("Invalid parking space Id");
+              valid = false;
+                errors.Add(new ErrorDto { ErrorID = "InvalidDate", ErrorDetail = "The booking date must be today or in the future." });
             }
-            return new EsherCarParkBookingResponseDto(isBooked, message, parkingSpaceId);
+            errors = errors.Any() ? errors : null;
+            return new EsherCarParkBookingResponseDto(valid, errors, esherCarParkBookingRequestDto.ParkingSpaceId, esherCarParkBookingRequestDto.DateBooked);
+
         }
-
-        internal string? Message { get; }
-        internal string ParkingSpaceId { get; }
+        private static bool IsValidDate(DateTime dateBooked)
+        {
+            return dateBooked.Date >= DateTime.UtcNow;
+        }
+        internal int ParkingSpaceId { get; }
         internal DateTime DateBooked { get; }
-
     }
 }
