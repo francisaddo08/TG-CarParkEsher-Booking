@@ -8,9 +8,9 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
         public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
-        public async Task<Result<Booking?>> CreateBookingAsync(Booking bookingForCreate, CancellationToken cancellationToken)
+        public async Task<Result<CarParkEsherBooking?>> CreateBookingAsync(CarParkEsherBooking bookingForCreate, CancellationToken cancellationToken)
         {
-           Booking? booking = null;
+           CarParkEsherBooking? booking = null;
             try
             {
                 using (var connection = GetConnection())
@@ -53,8 +53,9 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
 
                         //var lastInsertIdCommand = connection.CreateCommand();
                         //lastInsertIdCommand.CommandText = @"WITH lastid AS (SELECT last_insert_rowid()) 
-                        //                                    SELECT bookingid, bookee_id, datebooked, parkingspace_id, parkingstructure_id
+                        //                                    SELECT bookingid, bookee_id, datebooked, parkingspace_id, parkingstructure_id, datevalue, dayname
                         //                                    FROM booking
+                        //                                    inner join daysofweek on booking.dayofweek_id = daysofweek.id
                         //                                    WHERE bookingid = lastid";
 
                         //var lastInsertId =  await lastInsertIdCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
@@ -68,9 +69,9 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
             catch (Exception ex)
             {
 
-                return Result.Failure<Booking?>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
+                return Result.Failure<CarParkEsherBooking?>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
             }
-            return Result.Success<Booking?>(booking);
+            return Result.Success<CarParkEsherBooking?>(booking);
 
         }
         public async Task<bool>  UpdateDaysOfWeek()

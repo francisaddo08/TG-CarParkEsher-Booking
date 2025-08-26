@@ -38,15 +38,15 @@ namespace TG.CarParkEsher.Booking
 
             return ContextResult<EsherCarParkBookingResponseDto>.Success(esherCarParkBookingResponse);
         }
-        private async Task<Result<Booking>> NewBookingAsync(EsherCarParkBookingRequestDto bookingRequest)
+        private async Task<Result<CarParkEsherBooking>> NewBookingAsync(EsherCarParkBookingRequestDto bookingRequest)
         {
 
-            return Booking.Create(1, bookingRequest.DateBooked, bookingRequest.ParkingSpaceId, _defaultParkingStructureId);
+            return CarParkEsherBooking.Create(1, bookingRequest.DateBooked, bookingRequest.ParkingSpaceId, _defaultParkingStructureId);
 
         }
-        private async Task<Booking?> CreateBookingAsync(Booking bookingForCreate, CancellationToken cancellationToken)
+        private async Task<CarParkEsherBooking?> CreateBookingAsync(CarParkEsherBooking bookingForCreate, CancellationToken cancellationToken)
         {
-            Booking? booking = null;
+            CarParkEsherBooking? booking = null;
             var bookingResult = await _bookingRepository.CreateBookingAsync(bookingForCreate, cancellationToken);
             if (bookingResult.IsSuccess && bookingResult.Value is not null)
             {
