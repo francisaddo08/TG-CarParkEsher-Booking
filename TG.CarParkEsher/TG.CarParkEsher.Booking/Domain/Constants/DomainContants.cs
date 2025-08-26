@@ -1,7 +1,7 @@
 ﻿namespace TG.CarParkEsher.Booking
 {
-    internal static class DomainContants
+    public static class DomainContants
     {
-        internal static int MaxDayNameLength = 10;
+        public static int MaxDayNameLength = 10;
     }
 }

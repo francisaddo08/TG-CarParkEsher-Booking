@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace TG.CarParkEsher.Booking
 {
-    internal abstract class BaseRepository
+    public abstract class BaseRepository
     {
         protected readonly ILogger<BaseRepository> _logger;
         private readonly IOptionsMonitor<ConnectionOption> _connectionOption;

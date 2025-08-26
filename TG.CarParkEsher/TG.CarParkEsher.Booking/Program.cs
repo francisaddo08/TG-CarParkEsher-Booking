@@ -1,6 +1,6 @@
 using TG.CarParkEsher.Booking;
 
-internal class Program
+public class Program
 {
     private static void Main(string[] args)
     {
@@ -45,7 +45,7 @@ internal class Program
     }
 }
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+public record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }

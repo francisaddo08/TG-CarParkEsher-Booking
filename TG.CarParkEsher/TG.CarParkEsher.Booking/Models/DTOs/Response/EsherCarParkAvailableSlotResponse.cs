@@ -1,6 +1,6 @@
 ﻿namespace TG.CarParkEsher.Booking
 {
-    internal sealed class EsherCarParkAvailableSlotResponse
+    public sealed class EsherCarParkAvailableSlotResponse
     {
         private EsherCarParkAvailableSlotResponse(string? slotId, string? carParkId, DateTime? startTime, DateTime? endTime)
         {
@@ -9,7 +9,7 @@
             StartTime = startTime;
             EndTime = endTime;
         }
-        internal static EsherCarParkAvailableSlotResponse Create(string? slotId, string? carParkId, DateTime? startTime, DateTime? endTime)
+        public static EsherCarParkAvailableSlotResponse Create(string? slotId, string? carParkId, DateTime? startTime, DateTime? endTime)
         {
             return new EsherCarParkAvailableSlotResponse(slotId, carParkId, startTime, endTime);
         }

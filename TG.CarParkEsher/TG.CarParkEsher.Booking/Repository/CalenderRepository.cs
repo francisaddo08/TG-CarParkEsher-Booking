@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace TG.CarParkEsher.Booking
 {
-    internal sealed class CalenderRepository : BaseRepository, ICalenderRepository
+    public sealed class CalenderRepository : BaseRepository, ICalenderRepository
     {
         public CalenderRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {

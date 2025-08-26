@@ -1,6 +1,6 @@
 ﻿namespace TG.CarParkEsher.Booking
 {
-    internal sealed class ContextResult<T> where T : class
+    public sealed class ContextResult<T> where T : class
     {
         private ContextResult(T? result, string? error, bool isSuccess, bool isFailure, bool isServerError)
         {

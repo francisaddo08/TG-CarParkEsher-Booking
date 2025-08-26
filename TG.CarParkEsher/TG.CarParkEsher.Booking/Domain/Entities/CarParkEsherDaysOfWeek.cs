@@ -2,18 +2,18 @@
 
 namespace TG.CarParkEsher.Booking.Domain.Entities
 {
-    internal class CarParkEsherDaysOfWeek : BaseEntity<int>
+    public class CarParkEsherDaysOfWeek : Entity<int>
     {
-       internal string DayName { get; private set; }
-        internal int DayNumber { get; private set; }
-        internal DateTime DateValue { get; private set; }
+       public string DayName { get; private set; }
+        public int DayNumber { get; private set; }
+        public DateTime DateValue { get; private set; }
         private CarParkEsherDaysOfWeek(int id, string dayName, int dayNumber, DateTime dateValue):base(id)
         {
             DayName = dayName;
             DayNumber = dayNumber;
             DateValue = dateValue;
         }
-        internal static Result<CarParkEsherDaysOfWeek> Create(int id ,string dayName, int dayNumber, DateTime dateValue)
+        public static Result<CarParkEsherDaysOfWeek> Create(int id ,string dayName, int dayNumber, DateTime dateValue)
         {
             if (string.IsNullOrWhiteSpace(dayName) || dayName.Length > DomainContants.MaxDayNameLength)
             {

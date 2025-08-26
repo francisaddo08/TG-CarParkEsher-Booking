@@ -2,7 +2,7 @@
 
 namespace TG.CarParkEsher.Booking
 {
-    internal  class CalenderService : ICalenderService
+    public  class CalenderService : ICalenderService
     {
         private readonly ICalenderRepository _calenderRepository;
         public CalenderService(ICalenderRepository calenderRepository)

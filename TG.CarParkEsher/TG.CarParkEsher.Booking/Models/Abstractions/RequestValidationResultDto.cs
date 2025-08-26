@@ -2,7 +2,7 @@
 
 namespace TG.CarParkEsher.Booking
 {
-    internal abstract class RequestValidationResultDto
+    public abstract class RequestValidationResultDto
     {
         public RequestValidationResultDto(bool valid, IList<ErrorDto>? errors)
         {

@@ -3,7 +3,7 @@ using CSharpFunctionalExtensions;
 
 namespace TG.CarParkEsher.Booking
 {
-    internal interface IBookingRepository
+    public interface IBookingRepository
     {
         Task<Result<Booking?>> CreateBookingAsync(Booking bookingForCreate, CancellationToken cancellationToken);
     }

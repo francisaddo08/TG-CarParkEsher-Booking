@@ -3,13 +3,13 @@ using Microsoft.Extensions.Options;
 
 namespace TG.CarParkEsher.Booking
 {
-    internal sealed class EmployeeRepository : BaseRepository
+    public sealed class EmployeeRepository : BaseRepository
     {
         public EmployeeRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
 
-        internal async Task<Result<List<TGEmployee>>> GetEmployeesAsync(CancellationToken cancellationToken)
+        public async Task<Result<List<TGEmployee>>> GetEmployeesAsync(CancellationToken cancellationToken)
         {
             List<TGEmployee>? employees = new List<TGEmployee>();
             try

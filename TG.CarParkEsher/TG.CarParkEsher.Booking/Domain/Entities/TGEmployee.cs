@@ -1,8 +1,10 @@
-﻿namespace TG.CarParkEsher.Booking
+﻿using CSharpFunctionalExtensions;
+
+namespace TG.CarParkEsher.Booking
 {
-    internal sealed class TGEmployee :BaseEntity<string>
+    public sealed class TGEmployee :Entity<string>
     {
-       internal TGEmployee(string employeeid, int contact_id):base(employeeid) { ContactId = contact_id; }
-       internal int ContactId { get; set; }
+       public TGEmployee(string employeeid, int contact_id):base(employeeid) { ContactId = contact_id; }
+       public int ContactId { get; set; }
     }
 }

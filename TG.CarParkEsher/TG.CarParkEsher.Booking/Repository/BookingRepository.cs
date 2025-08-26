@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace TG.CarParkEsher.Booking.HostingExtensions
 {
-    internal sealed class BookingRepository : BaseRepository, IBookingRepository
+    public sealed class BookingRepository : BaseRepository, IBookingRepository
     {
         public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
@@ -22,7 +22,7 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
                         var command = connection.CreateCommand();
                        
 
-                        command.CommandText = @"INSERT INTO bookig (bookee_id, dateofbooking, datebooked, parkingspace_id, parkingstructure_id) 
+                        command.CommandText = @"INSERT INTO booking (bookee_id, dateofbooking, datebooked, parkingspace_id, parkingstructure_id) 
                                                 VALUES ($bookeeid, $dateofbooking, $datebooked, $parkingspaceid, $parkingstructureid)";
                         var bookeeIdParam = command.CreateParameter();
                         bookeeIdParam.ParameterName = "$bookeeid";
@@ -71,7 +71,7 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
             return Result.Success<Booking?>(booking);
 
         }
-        internal async Task<bool>  UpdateDaysOfWeek()
+        public async Task<bool>  UpdateDaysOfWeek()
         {
             try
             {

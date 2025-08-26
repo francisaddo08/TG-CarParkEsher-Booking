@@ -1,11 +1,11 @@
 ﻿namespace TG.CarParkEsher.Booking
 {
-    internal sealed class EsherCarParkBookingRequestDto
+    public sealed class EsherCarParkBookingRequestDto
     {
         
-        internal  int  ParkingSpaceId { get; set; }
-        internal int ParkingStructureId { get; set; }
-        internal DateTime DateBooked { get; set; }
+        public  int  ParkingSpaceId { get; set; }
+        public int ParkingStructureId { get; set; }
+        public DateTime DateBooked { get; set; }
 
     }
 }

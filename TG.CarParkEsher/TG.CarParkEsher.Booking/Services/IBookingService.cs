@@ -1,6 +1,7 @@
-﻿namespace TG.CarParkEsher.Booking.HostingExtensions
+﻿namespace TG.CarParkEsher.Booking
 {
-    internal interface IBookingService
+    public interface IBookingService
     {
+        public Task<ContextResult<EsherCarParkBookingResponseDto>> CreateBookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken);
     }
 }

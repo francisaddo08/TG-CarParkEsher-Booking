@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 
 
-namespace TG.CarParkEsher.Booking.HostingExtensions
+namespace TG.CarParkEsher.Booking
 {
-    internal sealed class BookingService
+    public sealed class BookingService : IBookingService
     {
         private readonly IBookingRepository _bookingRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;

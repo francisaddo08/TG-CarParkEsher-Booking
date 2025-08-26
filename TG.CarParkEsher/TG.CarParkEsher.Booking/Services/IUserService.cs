@@ -1,6 +1,6 @@
 ﻿namespace TG.CarParkEsher.Booking.HostingExtensions
 {
-    internal interface IUserService
+    public interface IUserService
     {
     }
 }

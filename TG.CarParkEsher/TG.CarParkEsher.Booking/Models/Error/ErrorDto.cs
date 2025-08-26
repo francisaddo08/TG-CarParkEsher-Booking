@@ -1,6 +1,6 @@
 ﻿namespace TG.CarParkEsher.Booking
 {
-    internal sealed class ErrorDto
+    public sealed class ErrorDto
     {
         public bool IsError => true;
         public string ErrorID { get; set; } = string.Empty;

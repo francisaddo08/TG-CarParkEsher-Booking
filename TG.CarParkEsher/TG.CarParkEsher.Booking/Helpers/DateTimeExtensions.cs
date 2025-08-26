@@ -1,8 +1,8 @@
 ﻿namespace TG.CarParkEsher.Booking
 {
-    internal static class DateTimeExtensions
+    public static class DateTimeExtensions
     {
-        internal static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
+        public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
         {
             int d = dt.DayOfWeek - startOfWeek;
             int diff = (7 + (dt.DayOfWeek - startOfWeek)) % 7;

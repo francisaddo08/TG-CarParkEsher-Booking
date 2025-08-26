@@ -2,7 +2,7 @@
 
 namespace TG.CarParkEsher.Booking
 {
-    internal sealed class EsherCarParkBookingResponseDto : RequestValidationResultDto
+    public sealed class EsherCarParkBookingResponseDto : RequestValidationResultDto
     {
         private EsherCarParkBookingResponseDto(bool valid, IList<ErrorDto>? errors, int parkingSpaceId, DateTime dateBooked)
             : base(valid, errors)
@@ -11,7 +11,7 @@ namespace TG.CarParkEsher.Booking
             DateBooked = dateBooked;
         }
 
-        internal static EsherCarParkBookingResponseDto Create(EsherCarParkBookingRequestDto esherCarParkBookingRequestDto)
+        public static EsherCarParkBookingResponseDto Create(EsherCarParkBookingRequestDto esherCarParkBookingRequestDto)
         {
             var valid = true;
             var errors = new List<ErrorDto>();
@@ -31,9 +31,9 @@ namespace TG.CarParkEsher.Booking
         }
         private static bool IsValidDate(DateTime dateBooked)
         {
-            return dateBooked.Date >= DateTime.UtcNow;
+            return dateBooked.Date >= DateTime.UtcNow.Date;
         }
-        internal int ParkingSpaceId { get; }
-        internal DateTime DateBooked { get; }
+        public int ParkingSpaceId { get; }
+        public DateTime DateBooked { get; }
     }
 }

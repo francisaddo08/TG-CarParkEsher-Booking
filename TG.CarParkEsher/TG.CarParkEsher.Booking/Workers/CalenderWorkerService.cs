@@ -1,6 +1,6 @@
 ﻿namespace TG.CarParkEsher.Booking
 {
-    internal sealed class CalenderWorkerService : BackgroundService
+    public sealed class CalenderWorkerService : BackgroundService
     {
         private readonly ILogger<CalenderWorkerService> _logger;
 
