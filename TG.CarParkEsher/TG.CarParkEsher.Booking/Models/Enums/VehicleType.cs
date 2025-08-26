@@ -1,6 +1,7 @@
-﻿namespace TG.CarParkEsher.Booking.Models.Enums
+﻿namespace TG.CarParkEsher.Booking
 {
-    public class VehicleType
+    public sealed class VehicleType
     {
+      
     }
 }
