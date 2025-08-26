@@ -4,16 +4,16 @@ namespace TG.CarParkEsher.Booking
 {
     internal static  class HostingExtension
     {
-       internal static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        internal static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddSingleton<EmployeeRepository>();
-            services.AddHostedService<CalenderWorkerService>();
-            //services.AddScoped<IBookingService, BookingService>();
-            //services.AddScoped<IBookingRepository, BookingRepository>();
-            //services.AddScoped<IUserRepository, UserRepository>();
-            //services.AddScoped<IUserService, UserService>();
-            //services.AddScoped<IEmailService, EmailService>();
-            //services.AddScoped<IEmailSender, EmailSender>();
+            
+            return services;
+        }
+        internal static IServiceCollection AddRepositories(this IServiceCollection services)
+        {
+            services.AddScoped<EmployeeRepository>();
+            services.AddScoped<ICalenderRepository, CalenderRepository>();
+
             return services;
         }
         internal static WebApplicationBuilder AddConfigurationsOptions(this WebApplicationBuilder builder)
@@ -21,8 +21,31 @@ namespace TG.CarParkEsher.Booking
             builder.Services.Configure<ConnectionOption>(builder.Configuration.GetSection("ConnectionOption"));
             return builder;
         }
-        public static WebApplication AddEndPoints(this WebApplication app)
+        internal static WebApplication ConfigureServices(this WebApplicationBuilder builder)
         {
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+            builder.AddConfigurationsOptions();
+            builder.Services.AddRepositories();
+            builder.Services.AddApplicationServices();
+            builder.Services.AddHostedService<CalenderWorkerService>();
+            return builder.Build();
+        }
+        public static WebApplication ConfigurePipeline(this WebApplication app)
+        {
+          
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseHttpsRedirection();
+
+            var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+
+
             app.MapGet("/employees", async (EmployeeRepository employeeRepository, CancellationToken cancellationToken) =>
             {
                 var result = await employeeRepository.GetEmployeesAsync(cancellationToken);
@@ -37,7 +60,23 @@ namespace TG.CarParkEsher.Booking
                 }
                 return Results.BadRequest(result.Error);
             });
-           
+
+
+            app.MapGet("/weatherforecast", () =>
+            {
+                var forecast = Enumerable.Range(1, 5).Select(index =>
+                    new WeatherForecast
+                    (
+                        DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                        Random.Shared.Next(-20, 55),
+                        summaries[Random.Shared.Next(summaries.Length)]
+                    ))
+                    .ToArray();
+                return forecast;
+            })
+            .WithName("GetWeatherForecast")
+            .WithOpenApi();
+
             return app;
         }
 

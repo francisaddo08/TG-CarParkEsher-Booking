@@ -18,7 +18,24 @@ namespace TG.CarParkEsher.Booking
           await Task.Yield();
           while (!cancellationToken.IsCancellationRequested)
             {
-              var dayss = WeekDays();   
+              //using(var scope = _serviceScopeFactory.CreateScope())
+              //  {
+              //      var calenderRepository = scope.ServiceProvider.GetRequiredService<CalenderRepository>();
+              //      var result = await calenderRepository.GetDaysOfWeek(cancellationToken);
+              //      if (result.IsSuccess)
+              //      {
+              //          var days = result.Value;
+              //          foreach (var day in days)
+              //          {
+              //              _logger.LogInformation("Day: {DayName}, DayNumber: {DayNumber}, DateValue: {DateValue}", day.DayName, day.DayNumber, day.DateValue.ToString("yyyy-MM-dd"));
+              //          }
+              //      }
+              //      else
+              //      {
+              //          _logger.LogError("Failed to retrieve days of the week: {Error}", result.Error);
+              //      }
+              //  }
+                var dayss = WeekDays();   
 
                 await  Task.Delay(3000000, cancellationToken);
             }
@@ -28,7 +45,7 @@ namespace TG.CarParkEsher.Booking
         }
         public List<EsherCarParkDayInfo> WeekDays()
         {
-            var todaysDate = DateTime.UtcNow.ToShortDateString();
+            
             DateTime Monday = DateTime.Now.StartOfWeek(DayOfWeek.Monday);
             DateTime Tuesday = Monday.AddDays(1);
             DateTime Wednesday = Monday.AddDays(2);
@@ -47,12 +64,7 @@ namespace TG.CarParkEsher.Booking
                   new EsherCarParkDayInfo(DayOfWeek.Saturday.ToString(),6, Saturday),
                   new EsherCarParkDayInfo(DayOfWeek.Sunday.ToString(), 7,Sunday)
                 };
-            CultureInfo cinfo = new CultureInfo("en-uk");
-            CalendarWeekRule wr = cinfo.DateTimeFormat.CalendarWeekRule;
-            DayOfWeek firstDayOfWeek = DayOfWeek.Monday;
-            //get calendar from culture info
-            Calendar c = cinfo.Calendar;
-            int currentWeekNumber = c.GetWeekOfYear(DateTime.Now, wr, firstDayOfWeek);
+           
             return WeekDates;
         }
     }
