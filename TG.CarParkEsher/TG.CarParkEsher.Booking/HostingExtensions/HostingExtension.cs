@@ -45,7 +45,11 @@ namespace TG.CarParkEsher.Booking
 
             var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
 
+            app.MapPost("/bookslot", (EsherCarParkBookingRequestDto bookingRequest, HttpContext cxt, CancellationToken cancellation) =>
+            {
+               
 
+            });
             app.MapGet("/employees", async (EmployeeRepository employeeRepository, CancellationToken cancellationToken) =>
             {
                 var result = await employeeRepository.GetEmployeesAsync(cancellationToken);
