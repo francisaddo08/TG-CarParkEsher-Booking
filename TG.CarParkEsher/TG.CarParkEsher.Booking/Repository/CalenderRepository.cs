@@ -23,7 +23,10 @@ namespace TG.CarParkEsher.Booking
                         command.CommandText = @"DELETE FROM daysofweek";
                         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 
-                        command.CommandText = @"INSERT INTO daysofweek (dayname, daynumber, datevalue) VALUES ($dayname, $daynumber, $datevalue)";
+                        command.CommandText = @"INSERT INTO daysofweek (id,dayname, daynumber, datevalue) VALUES ($id, $dayname, $daynumber, $datevalue)";
+                       var idParam = command.CreateParameter();
+                        idParam.ParameterName = "$id";
+                        command.Parameters.Add(idParam);
                         var dayNameParam = command.CreateParameter();
                         dayNameParam.ParameterName = "$dayname";
                         command.Parameters.Add(dayNameParam);
@@ -35,6 +38,7 @@ namespace TG.CarParkEsher.Booking
                         command.Parameters.Add(dateValueParam);
                         foreach (var dayInfo in esherCarParkDayInfos)
                         {
+                            idParam.Value = dayInfo.DayNumber;
                             dayNameParam.Value = dayInfo.DayName;
                             dayNumberParam.Value = dayInfo.DayNumber;
                             dateValueParam.Value = dayInfo.DateValue;

@@ -9,7 +9,7 @@ namespace TG.CarParkEsher.Booking
         {
             Id = id;
             BookeeId = bookeeId;
-            DateBooked = dateBooked;
+            DateBookedId = (int) dateBooked.DayOfWeek == 0 ? DomainContants.UKSundayDayNumber : (int)dateBooked.DayOfWeek;
             ParkingSpaceId = parkingSpaceId;
             ParkingStructureId = parkingStructureId;
         }
@@ -34,7 +34,7 @@ namespace TG.CarParkEsher.Booking
             return Result.Success<Booking>(new Booking(DefaultBookingId, bookeeId, dateBooked, parkingSpaceId, parkingStructureId));
         }
         public int BookeeId { get; private set; }
-        public DateTime DateBooked { get; private set; }
+        public int DateBookedId { get; private set; }
         public int ParkingSpaceId { get; private set; }
         public int ParkingStructureId { get; private set; }
 

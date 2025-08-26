@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace TG.CarParkEsher.Booking.Controllers
 {
@@ -16,14 +15,14 @@ namespace TG.CarParkEsher.Booking.Controllers
             _bookingService = bookingService ?? throw new ArgumentNullException(nameof(bookingService));
         }
         [HttpPost("booking/create")]
-        public async Task<ActionResult<EsherCarParkBookingResponseDto>> CreateBookingAsync( EsherCarParkBookingRequestDto request, CancellationToken cancellationToken)
+        public async Task<ActionResult<EsherCarParkBookingResponseDto>> CreateBookingAsync(EsherCarParkBookingRequestDto request, CancellationToken cancellationToken)
         {
-           var bookingresult = await _bookingService.CreateBookSlotAsync(request, cancellationToken);
+            var bookingresult = await _bookingService.CreateBookSlotAsync(request, cancellationToken);
             if (bookingresult.IsFailure)
             {
                 if (bookingresult.IsServerError)
                 {
-                    
+
                     return StatusCode(StatusCodes.Status500InternalServerError, bookingresult.Result);
                 }
                 return StatusCode(StatusCodes.Status406NotAcceptable, bookingresult.Result);

@@ -22,17 +22,19 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
                         var command = connection.CreateCommand();
                        
 
-                        command.CommandText = @"INSERT INTO booking (bookee_id, dateofbooking, datebooked, parkingspace_id, parkingstructure_id) 
-                                                VALUES ($bookeeid, $dateofbooking, $datebooked, $parkingspaceid, $parkingstructureid)";
+                        command.CommandText = @"INSERT INTO booking (bookee_id, dateofbooking, dayofweek_id, parkingspace_id, parkingstructure_id) 
+                                                VALUES ($bookeeid, $dateofbooking, $dayofweekid, $parkingspaceid, $parkingstructureid)";
                         var bookeeIdParam = command.CreateParameter();
                         bookeeIdParam.ParameterName = "$bookeeid";
                         command.Parameters.Add(bookeeIdParam);
                         var dateOfBookingParam = command.CreateParameter();
                         dateOfBookingParam.ParameterName = "$dateofbooking";
                         command.Parameters.Add(dateOfBookingParam);
-                        var dateBookedParam = command.CreateParameter();
-                        dateBookedParam.ParameterName = "$datebooked";
-                        command.Parameters.Add(dateBookedParam);
+
+                        var dateBookedIdParam = command.CreateParameter();
+                        dateBookedIdParam.ParameterName = "$dayofweekid";
+                        command.Parameters.Add(dateBookedIdParam);
+
                         var parkingSpaceIdParam = command.CreateParameter();
                         parkingSpaceIdParam.ParameterName = "$parkingspaceid";
                         command.Parameters.Add(parkingSpaceIdParam);
@@ -42,7 +44,7 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
 
                         bookeeIdParam.Value = bookingForCreate.BookeeId;
                         dateOfBookingParam.Value = DateTime.UtcNow;
-                        dateBookedParam.Value = bookingForCreate.DateBooked;
+                        dateBookedIdParam.Value = bookingForCreate.DateBookedId;
                         parkingSpaceIdParam.Value = bookingForCreate.ParkingSpaceId;
                         parkingStructureIdParam.Value = bookingForCreate.ParkingStructureId;
                         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
