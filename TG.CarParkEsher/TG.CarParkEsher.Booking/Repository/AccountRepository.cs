@@ -35,7 +35,8 @@ namespace TG.CarParkEsher.Booking
                     {
                         if (await reader.ReadAsync(cancellationToken))
                         {
-                            isFound = reader.IsDBNull(reader.GetOrdinal("contact_id"));
+                           int id = reader.GetInt32(reader.GetOrdinal("contact_id"));
+                            isFound = reader.HasRows;
 
 
                         }
