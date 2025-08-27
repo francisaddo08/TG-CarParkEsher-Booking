@@ -29,7 +29,7 @@ namespace TG.CarParkEsher.Booking
                 valid = false;
                 errors.Add(new ErrorDto { ErrorID = "InvalidPassword", ErrorDetail = "Password must be at least 8 characters long." });
             }
-            if( password == confirmPassword )
+            if( password != confirmPassword )
             {
                 valid = false;
                 errors.Add(new ErrorDto { ErrorID = "InvalidPassword", ErrorDetail = "Password and Confirm Password must match." });
@@ -88,6 +88,7 @@ namespace TG.CarParkEsher.Booking
         public string FirstName { get; }
         public string LastName { get; }
         public string VehicleType { get; }
+        
 
 
         private static bool ContainsSpecialOrNumber(string input)

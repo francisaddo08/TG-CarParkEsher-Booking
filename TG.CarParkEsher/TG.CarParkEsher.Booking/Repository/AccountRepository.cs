@@ -21,7 +21,7 @@ namespace TG.CarParkEsher.Booking
                     {
                         var command = connection.CreateCommand();
                         command.CommandText = @"INSERT INTO account (contact_id, vehicletype, password, salt, passwordhash) 
-                                                carParkEsherAccountS ($contactid, $vehicletype,  $password, $salt, $passwordhash)";
+                                                ($contactid, $vehicletype,  $password, $salt, $passwordhash)";
                         var contactIdParam = command.CreateParameter();
                         contactIdParam.ParameterName = "$contactid";
                         command.Parameters.Add(contactIdParam);
@@ -96,7 +96,11 @@ namespace TG.CarParkEsher.Booking
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating account for ContactId {ContactId}", carParkEsherAccountValue.ContactId);
-                return Result.Failure<CarParkEsherAccount?>("An error occurred while creating the account.");
+                return Result.Failure<CarParkEsherAccount?>($"{ex.Message}.{ex.InnerException?.Message}");
+            }
+            if (carParkEsherAccount == null)
+            {
+                return Result.Failure<CarParkEsherAccount?>("Account could not be created.");
             }
             return Result.Success<CarParkEsherAccount?>(carParkEsherAccount);
         }

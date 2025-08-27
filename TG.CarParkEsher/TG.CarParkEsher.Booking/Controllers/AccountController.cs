@@ -14,7 +14,7 @@ namespace TG.CarParkEsher.Booking.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
         }
-       [HttpPost("create-account")]
+       [HttpPost("account/create-account")]
         public async Task<ActionResult<EsherCarParkrRegistrationResponseDto>> CreateAccountAsync(EsherCarParkRegistrationRequestDto request, CancellationToken cancellationToken)
         {
             var userResult = await _accountService.CreateAccountAsync(request, cancellationToken);

@@ -8,6 +8,7 @@ namespace TG.CarParkEsher.Booking
         {
             services.AddScoped<ICalenderService, CalenderService>();
             services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IAccountService, AccountService>();
             return services;
         }
         public static IServiceCollection AddRepositories(this IServiceCollection services)
@@ -15,6 +16,7 @@ namespace TG.CarParkEsher.Booking
             services.AddScoped<EmployeeRepository>();
             services.AddScoped<ICalenderRepository, CalenderRepository>();
             services.AddScoped<IBookingRepository, BookingRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
 
             return services;
         }
@@ -25,7 +27,12 @@ namespace TG.CarParkEsher.Booking
         }
         public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
         {
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+
+                });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>

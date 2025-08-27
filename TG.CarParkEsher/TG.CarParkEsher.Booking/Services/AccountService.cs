@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Cryptography;
+using TG.CarParkEsher.Booking.Models.Error;
 
 namespace TG.CarParkEsher.Booking
 {
@@ -27,15 +28,26 @@ namespace TG.CarParkEsher.Booking
             if (foundEmployee.IsFailure)
             {
                 _logger.LogWarning("Account not found for {FirstName} {LastName} with EmployeeId {EmployeeId}", request.FirstName, request.LastName, request.EmplyeeId);
-                return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure("Registration failed Problem with your details, Ensure your details are correct", true);
+                var errors = new List<ErrorDto> { new ErrorDto { ErrorID = "AccountNotFound", ErrorDetail = "No account found with the provided details. Please ensure your details are correct." } };
+                esherCarParkRegistrationResponse.SetValidation(false, errors);
+                return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure(esherCarParkRegistrationResponse, true);
             }
             var newAccountForCreate = await newAccount(foundEmployee.Value, request);
             if (newAccountForCreate.IsFailure)
             {
                 _logger.LogError("Failed to create new account for {FirstName} {LastName} with EmployeeId {EmployeeId}: {Error}", request.FirstName, request.LastName, request.EmplyeeId, newAccountForCreate.Error);
-                return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure("Registration failed Problem with your details, Ensure your details are correct", true);
+                var errors = new List<ErrorDto> { new ErrorDto { ErrorID = "RegistrationFailed", ErrorDetail = "Problem with details, make sure correct details are supplied" } };
+                return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure( esherCarParkRegistrationResponse, true);
             }
             var createdAccount = await _userRepository.CreateAccountAsync(newAccountForCreate.Value, cancellationToken);
+            if (createdAccount.IsFailure)
+            {
+                _logger.LogError("Failed to save new account for {FirstName} {LastName} with EmployeeId {EmployeeId}: {Error}", request.FirstName, request.LastName, request.EmplyeeId, createdAccount.Error);
+                var errors = new List<ErrorDto> { new ErrorDto { ErrorID = "RegistrationFailed", ErrorDetail = ErrorMessages.InternalServerError } };
+                esherCarParkRegistrationResponse.SetValidation(false, errors);
+                return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure( esherCarParkRegistrationResponse, true);
+            }
+            return ContextResult<EsherCarParkrRegistrationResponseDto>.Success(esherCarParkRegistrationResponse);
 
 
 
