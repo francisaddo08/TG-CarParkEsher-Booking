@@ -13,7 +13,7 @@ namespace TG.CarParkEsher.Booking
             CarParkEsherAccount? carParkEsherAccount = null;
             if (string.IsNullOrWhiteSpace(username))
             {
-                return Result.Failure<CarParkEsherAccount?>("Username cannot be empty."));
+                return Result.Failure<CarParkEsherAccount?>("Username cannot be empty.");
             }
             try
             {
@@ -54,13 +54,13 @@ namespace TG.CarParkEsher.Booking
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving account for username {Username}", username);
-                return  Result.Failure<CarParkEsherAccount?>($"{ex.Message}.{ex.InnerException?.Message}"));
+                return  Result.Failure<CarParkEsherAccount?>($"{ex.Message}.{ex.InnerException?.Message}");
             }
             if (carParkEsherAccount == null)
             {
-                return  Result.Failure<CarParkEsherAccount?>("Account not found."));
+                return  Result.Failure<CarParkEsherAccount?>("Account not found.");
             }
-            return Result.Success<CarParkEsherAccount?>(carParkEsherAccount));
+            return Result.Success<CarParkEsherAccount?>(carParkEsherAccount);
 
         }
         public async Task<Result<CarParkEsherAccount?>> CreateAccountAsync(CarParkEsherAccount carParkEsherAccountValue, CancellationToken cancellationToken)

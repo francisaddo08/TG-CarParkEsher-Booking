@@ -1,6 +1,10 @@
-﻿namespace TG.CarParkEsher.Booking.Security.Claims
+﻿namespace TG.CarParkEsher.Booking
 {
-    public class UserClaimTypes
+    public static class UserClaimTypes
     {
+        public const string ApiClient = "client_id";
+        public const string ViewAvailableSlot = "view_slot";
+        public const string BookSlot = "book_slot";
+
     }
 }

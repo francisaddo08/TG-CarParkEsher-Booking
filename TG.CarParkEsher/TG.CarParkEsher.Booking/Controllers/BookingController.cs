@@ -6,7 +6,7 @@ namespace TG.CarParkEsher.Booking.Controllers
     [Tags("Booking")]
     [Route("api/v1-0/tg")]
     [ApiController]
-    [Authorize]
+    [Authorize("TGEmployeePolicy")]
     public class BookingController : ControllerBase
     {
         private readonly ILogger<BookingController> _logger;

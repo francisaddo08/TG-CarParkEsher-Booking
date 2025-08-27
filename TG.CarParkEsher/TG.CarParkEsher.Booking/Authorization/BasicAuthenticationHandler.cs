@@ -1,7 +1,7 @@
-﻿using CSharpFunctionalExtensions;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 
@@ -60,7 +60,15 @@ namespace TG.CarParkEsher.Booking
 
                 if (user != null && validationResult.Value == true)
                 {
-                   
+                    var claims = new List<Claim>()
+                    {
+                       new Claim(UserClaimTypes.BookSlot , "enabled"),
+                       new Claim(UserClaimTypes.ViewAvailableSlot , "enabled"),
+                    };
+                    var identity = new ClaimsIdentity(claims, Scheme.Name);
+                    var principal = new ClaimsPrincipal(identity);
+                    var _ticket = new AuthenticationTicket(principal, Scheme.Name);
+                    return AuthenticateResult.Success(_ticket);
                 }
                 else
                 {
@@ -69,7 +77,7 @@ namespace TG.CarParkEsher.Booking
             }
             catch
             {
-                return AuthenticateResult.Fail("Invalid Authorization Header"));
+                return AuthenticateResult.Fail("Invalid Authorization Header");
             }
 
         }

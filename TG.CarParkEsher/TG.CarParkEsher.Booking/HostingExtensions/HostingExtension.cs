@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace TG.CarParkEsher.Booking
@@ -10,6 +11,21 @@ namespace TG.CarParkEsher.Booking
             services.AddScoped<ICalenderService, CalenderService>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IAccountService, AccountService>();
+            return services;
+        }
+        private static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
+        {
+            services.AddSingleton<IAuthorizationHandler, TGEmplyeeAuthorizationHandler>();
+            services.AddAuthorization(options =>
+               {
+                   options.AddPolicy("TGEmployeePolicy", policy =>
+                   {
+                       policy.RequireAuthenticatedUser();
+                       policy.AddRequirements(new TGEmplyeeAuthorizationRequirement());
+                   }
+                   );
+                   
+               });
             return services;
         }
         public static IServiceCollection AddRepositories(this IServiceCollection services)
@@ -24,6 +40,7 @@ namespace TG.CarParkEsher.Booking
         public static WebApplicationBuilder AddConfigurationsOptions(this WebApplicationBuilder builder)
         {
             builder.Services.Configure<ConnectionOption>(builder.Configuration.GetSection("ConnectionOption"));
+            builder.Services.AddAuthorizationPolicies();
             return builder;
         }
         public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
