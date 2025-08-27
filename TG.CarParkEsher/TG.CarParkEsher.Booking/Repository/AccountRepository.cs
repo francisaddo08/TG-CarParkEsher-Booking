@@ -20,8 +20,7 @@ namespace TG.CarParkEsher.Booking
                     using (var transaction = connection.BeginTransaction())
                     {
                         var command = connection.CreateCommand();
-                        command.CommandText = @"INSERT INTO account (contact_id, vehicletype, password, salt, passwordhash) 
-                                                ($contactid, $vehicletype,  $password, $salt, $passwordhash)";
+                        command.CommandText = @"INSERT INTO account (contact_id, vehicletype, password, salt, passwordhash) VALUES($contactid, $vehicletype,  $password, $salt, $passwordhash)";
                         var contactIdParam = command.CreateParameter();
                         contactIdParam.ParameterName = "$contactid";
                         command.Parameters.Add(contactIdParam);
@@ -68,24 +67,20 @@ namespace TG.CarParkEsher.Booking
                         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 
 
-                        command.CommandText = @"SELECT AccountId, ContactId, VehicleType, PasswordHash, PasswordSalt, FirstName, LastName, EmployeeId 
-                                                FROM carpark_esher_account 
-                                                WHERE contact_id = $contactid
-                                                ORDER BY AccountId DESC
+                        command.CommandText = @"SELECT  FirstName, LastName
+                                                FROM v_employee_contact
+                                                WHERE contactid = $contactid
                                                 LIMIT 1";
                         using (var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
                         {
                             while (reader.Read())
                             {
-                                var accountId = reader.GetInt32(reader.GetOrdinal("AccountId"));
-                                var contactId = reader.GetInt32(reader.GetOrdinal("ContactId"));
-                                var vehicleType = reader.GetString(reader.GetOrdinal("VehicleType"));
-                                var passwordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
-                                var passwordSalt = reader.GetString(reader.GetOrdinal("PasswordSalt"));
+                               
+                              
                                 var firstName = reader.GetString(reader.GetOrdinal("FirstName"));
                                 var lastName = reader.GetString(reader.GetOrdinal("LastName"));
-                                var employeeId = reader.GetString(reader.GetOrdinal("EmployeeId"));
-                                carParkEsherAccount = new CarParkEsherAccount(accountId, contactId, vehicleType, string.Empty, passwordHash, firstName, lastName, employeeId, passwordSalt);
+                                
+                                carParkEsherAccount = new CarParkEsherAccount(0, 0, string.Empty, string.Empty, string.Empty, firstName, lastName, string.Empty, string.Empty);
                             }
 
                         }
