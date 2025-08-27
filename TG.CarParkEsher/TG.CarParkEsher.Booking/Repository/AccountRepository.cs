@@ -66,7 +66,7 @@ namespace TG.CarParkEsher.Booking
                 {
                     await connection.OpenAsync(cancellationToken);
                     var command = connection.CreateCommand();
-                    command.CommandText = @"SELECT EmployeeId, ContactId, FirstName, LastName, VehicleType, Salt, PasswordHash, Active, FROM v_employee_contact_account WHERE  EmployeeId = $EmployeeId";
+                    command.CommandText = @"SELECT EmployeeId, ContactId, FirstName, LastName, VehicleType, Salt, PasswordHash, IsActive, IsBlocked FROM v_employee_contact_account WHERE  EmployeeId = $EmployeeId";
 
                     var employeeIdParam = command.CreateParameter();
                     employeeIdParam.ParameterName = "$EmployeeId";
@@ -75,11 +75,13 @@ namespace TG.CarParkEsher.Booking
 
                    
 
+                   
+
                     using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                     {
                         if (await reader.ReadAsync(cancellationToken))
                         {
-                            var empId = reader.GetString(reader.GetOrdinal("EmployeeId"));
+                            var empId = reader.IsDBNull(reader.GetOrdinal("EmployeeId")) ? string.Empty : reader.GetString(reader.GetOrdinal("EmployeeId"));
                             var contactId = reader.GetInt32(reader.GetOrdinal("ContactId"));
                             var vehicleType = reader.IsDBNull(reader.GetOrdinal("VehicleType")) ? string.Empty : reader.GetString(reader.GetOrdinal("VehicleType"));
                             var salt = reader.IsDBNull(reader.GetOrdinal("Salt")) ? string.Empty : reader.GetString(reader.GetOrdinal("Salt"));
@@ -87,9 +89,9 @@ namespace TG.CarParkEsher.Booking
 
                             var fName = reader.GetString(reader.GetOrdinal("FirstName"));
                             var lName = reader.GetString(reader.GetOrdinal("LastName"));
-                            var isActive = reader.GetBoolean(reader.GetOrdinal("Active"));
+                            var isActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
                             var isBlocked = reader.GetBoolean(reader.GetOrdinal("IsBlocked"));
-                            carParkEsherAccount = new  CarParkEsherAccount(0,contactId, vehicleType, string.Empty, passwordHash, fName, lName, empId, string.Empty, isActive, isBlocked);
+                            carParkEsherAccount = new  CarParkEsherAccount(0,contactId, vehicleType, string.Empty, passwordHash, fName, lName, empId, salt, isActive, isBlocked);
                         }
                     }
                 }

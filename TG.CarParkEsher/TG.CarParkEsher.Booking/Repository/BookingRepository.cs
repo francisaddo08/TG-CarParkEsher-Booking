@@ -53,7 +53,7 @@ namespace TG.CarParkEsher.Booking
                         command.CommandText = @"SELECT BookingId, EmployeeId,ContatcId,FirstName,LastName,ParkingSpace,DayName,DateValue
                                                FROM  v_employee_contact_booking
                                                WHERE EmployeeId = $bookeeid
-                                                ORDER BY b.booking_id DESC
+                                                ORDER BY BookingId DESC
                                                 LIMIT 1";
                         using (var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
                         {

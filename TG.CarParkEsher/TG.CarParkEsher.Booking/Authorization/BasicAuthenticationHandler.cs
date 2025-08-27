@@ -28,7 +28,7 @@ namespace TG.CarParkEsher.Booking
         {
             if (!Request.Headers.ContainsKey("Authorization"))
             {
-                return await Task.FromResult(AuthenticateResult.Fail("Missing Authorization Header"));
+                return  AuthenticateResult.Fail("Missing Authorization Header");
             }
             try
             {

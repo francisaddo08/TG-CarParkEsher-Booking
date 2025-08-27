@@ -52,7 +52,7 @@ namespace TG.CarParkEsher.Booking
                 return Result.Failure<bool>("User account locked out");
             }
             var expectedPassword = _passwordHasher.HashPassword(_user, _password);
-            var verificationResult = _passwordHasher.VerifyHashedPassword(_user, _user.Password, _password);
+            var verificationResult = _passwordHasher.VerifyHashedPassword(_user, _user.PasswordHash, _user.Salt+_password);
 
             if (verificationResult == PasswordVerificationResult.Success)
             {
