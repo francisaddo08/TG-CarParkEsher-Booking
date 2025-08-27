@@ -9,6 +9,98 @@ namespace TG.CarParkEsher.Booking
         {
         }
 
+        public async Task<Result<CarParkEsherAccount?>> CreateAccountAsync(CarParkEsherAccount carParkEsherAccountValue, CancellationToken cancellationToken)
+        {
+          CarParkEsherAccount? carParkEsherAccount = null;
+            try
+            {
+                using (var connection = GetConnection())
+                {
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        var command = connection.CreateCommand();
+                        command.CommandText = @"INSERT INTO account (contact_id, vehicletype, password, salt, passwordhash) 
+                                                carParkEsherAccountS ($contactid, $vehicletype,  $password, $salt, $passwordhash)";
+                        var contactIdParam = command.CreateParameter();
+                        contactIdParam.ParameterName = "$contactid";
+                        command.Parameters.Add(contactIdParam);
+
+                        var vehicleTypeParam = command.CreateParameter();
+                        vehicleTypeParam.ParameterName = "$vehicletype";
+                        command.Parameters.Add(vehicleTypeParam);
+
+                       var passwordParam = command.CreateParameter();
+                        passwordParam.ParameterName = "$password";
+                        command.Parameters.Add(passwordParam);
+
+                        var passwordSaltParam = command.CreateParameter();
+                        passwordSaltParam.ParameterName = "$salt";
+                        command.Parameters.Add(passwordSaltParam);
+
+                        var passwordHashParam = command.CreateParameter();
+                        passwordHashParam.ParameterName = "$passwordhash";
+                        command.Parameters.Add(passwordHashParam);
+
+                        //var firstNameParam = command.CreateParameter();
+                        //firstNameParam.ParameterName = "$firstname";
+                        //command.Parameters.Add(firstNameParam);
+
+                        //var lastNameParam = command.CreateParameter();
+                        //lastNameParam.ParameterName = "$lastname";
+                        //command.Parameters.Add(lastNameParam);
+
+                        //var employeeIdParam = command.CreateParameter();
+                        //employeeIdParam.ParameterName = "$employeeid";
+                        //command.Parameters.Add(employeeIdParam);
+
+                        contactIdParam.Value = carParkEsherAccountValue.ContactId;
+                        vehicleTypeParam.Value = carParkEsherAccountValue.VehicleType;
+                        passwordParam.Value = carParkEsherAccountValue.Password;
+                        passwordSaltParam.Value = carParkEsherAccountValue.Salt;
+                        passwordHashParam.Value = carParkEsherAccountValue.PasswordHash;
+                       
+                       
+
+                        //firstNameParam.Value = value.FirstName;
+                        //lastNameParam.Value = value.LastName;
+                        //employeeIdParam.Value = value.EmployeeId;
+                        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+
+
+                        command.CommandText = @"SELECT AccountId, ContactId, VehicleType, PasswordHash, PasswordSalt, FirstName, LastName, EmployeeId 
+                                                FROM carpark_esher_account 
+                                                WHERE contact_id = $contactid
+                                                ORDER BY AccountId DESC
+                                                LIMIT 1";
+                        using (var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+                        {
+                            while (reader.Read())
+                            {
+                                var accountId = reader.GetInt32(reader.GetOrdinal("AccountId"));
+                                var contactId = reader.GetInt32(reader.GetOrdinal("ContactId"));
+                                var vehicleType = reader.GetString(reader.GetOrdinal("VehicleType"));
+                                var passwordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
+                                var passwordSalt = reader.GetString(reader.GetOrdinal("PasswordSalt"));
+                                var firstName = reader.GetString(reader.GetOrdinal("FirstName"));
+                                var lastName = reader.GetString(reader.GetOrdinal("LastName"));
+                                var employeeId = reader.GetString(reader.GetOrdinal("EmployeeId"));
+                                carParkEsherAccount = new CarParkEsherAccount(accountId, contactId, vehicleType, string.Empty, passwordHash, firstName, lastName, employeeId, passwordSalt);
+                            }
+
+                        }
+                        transaction.Commit();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating account for ContactId {ContactId}", carParkEsherAccountValue.ContactId);
+                return Result.Failure<CarParkEsherAccount?>("An error occurred while creating the account.");
+            }
+            return Result.Success<CarParkEsherAccount?>(carParkEsherAccount);
+        }
+
         public async Task<Result<CarParkEsherEmployeeContact>> GetAccountAsync(string firstName, string lastName, string emplyeeId, CancellationToken cancellationToken)
         {
             CarParkEsherEmployeeContact? contact = null;

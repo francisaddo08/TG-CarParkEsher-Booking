@@ -1,4 +1,4 @@
-﻿using TG.CarParkEsher.Booking.HostingExtensions;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace TG.CarParkEsher.Booking
 {
@@ -7,7 +7,7 @@ namespace TG.CarParkEsher.Booking
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<ICalenderService, CalenderService>();
-            services.AddScoped<IBookingService, BookingService>();  
+            services.AddScoped<IBookingService, BookingService>();
             return services;
         }
         public static IServiceCollection AddRepositories(this IServiceCollection services)
@@ -24,10 +24,12 @@ namespace TG.CarParkEsher.Booking
             return builder;
         }
         public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
-        {   builder.Services.AddControllers();
+        {
+            builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(c => { 
+            builder.Services.AddSwaggerGen(c =>
+            {
                 c.SwaggerDoc("v1", new() { Title = "TG.CarParkEsher.Booking", Version = "v1" });
 
             });
@@ -35,6 +37,7 @@ namespace TG.CarParkEsher.Booking
 
             builder.Services.AddHttpContextAccessor();
             builder.AddConfigurationsOptions();
+            builder.Services.AddScoped<IPasswordHasher<CarParkEsherAccount>, PasswordHasher<CarParkEsherAccount>>();
             builder.Services.AddRepositories();
             builder.Services.AddApplicationServices();
             builder.Services.AddHostedService<CalenderWorkerService>();
@@ -44,7 +47,7 @@ namespace TG.CarParkEsher.Booking
         {
 
             // Configure the HTTP request pipeline.
-            
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -53,7 +56,7 @@ namespace TG.CarParkEsher.Booking
 
             app.UseHttpsRedirection();
 
-             app.MapControllers();
+            app.MapControllers();
 
             return app;
         }
