@@ -5,7 +5,7 @@ namespace TG.CarParkEsher.Booking
     public sealed class CarParkEsherAccount :Entity<int>
     {
     private const int DefaultId = 0;
-        public CarParkEsherAccount(int id, int contactId, string vehicleType, string password, string passwordHash, string firstName, string lastName, string employeeId, string salt) : base(id)
+        public CarParkEsherAccount(int id, int contactId, string vehicleType, string password, string passwordHash, string firstName, string lastName, string employeeId, string salt, bool isActive, bool isBlocked) : base(id)
         {
             ContactId = contactId;
             VehicleType = vehicleType;
@@ -15,8 +15,10 @@ namespace TG.CarParkEsher.Booking
             LastName = lastName;
             EmployeeId = employeeId;
             Salt = salt;
+            IsActive = isActive;
+            IsLocked = isBlocked;
         }
-        public static Result<CarParkEsherAccount> Create( int contactId, string vehicleType, string password, string passwordHash, string firstName, string lastName, string employeeId, string salt)
+        public static Result<CarParkEsherAccount> Create( int contactId, string vehicleType, string password, string passwordHash, string firstName, string lastName, string employeeId, string salt, bool isActive, bool isBlocked)
         {
             if (contactId <= 0)
             {
@@ -46,7 +48,7 @@ namespace TG.CarParkEsher.Booking
             {
                 return Result.Failure<CarParkEsherAccount>("Salt cannot be empty.");
             }
-            return Result.Success(new CarParkEsherAccount(DefaultId, contactId, vehicleType, password, passwordHash, firstName, lastName, employeeId, salt));
+            return Result.Success(new CarParkEsherAccount(DefaultId, contactId, vehicleType, password, passwordHash, firstName, lastName, employeeId, salt, isActive, isBlocked));
         }
         
         public int ContactId { get;}
@@ -57,7 +59,9 @@ namespace TG.CarParkEsher.Booking
         public string LastName { get; }
         public string EmployeeId { get; }
         public string Salt { get; }
+        public bool IsActive { get; } 
+        public bool IsLocked { get; } 
 
-   
+
     }
 }

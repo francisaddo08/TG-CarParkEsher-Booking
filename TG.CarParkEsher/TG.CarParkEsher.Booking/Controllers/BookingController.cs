@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TG.CarParkEsher.Booking.Controllers
 {
     [Tags("Booking")]
     [Route("api/v1-0/tg")]
     [ApiController]
+    [Authorize]
     public class BookingController : ControllerBase
     {
         private readonly ILogger<BookingController> _logger;

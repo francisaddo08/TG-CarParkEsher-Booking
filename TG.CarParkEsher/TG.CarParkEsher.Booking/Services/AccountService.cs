@@ -8,15 +8,58 @@ namespace TG.CarParkEsher.Booking
     public sealed class AccountService : IAccountService
     {
         private readonly ILogger<AccountService> _logger;
-        private readonly IAccountRepository _userRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly IPasswordHasher<CarParkEsherAccount> _passwordHasher;
         public AccountService(ILogger<AccountService> logger, IAccountRepository userRepository, IPasswordHasher<CarParkEsherAccount> passwordHasher)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _accountRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         }
+        public async Task<Result<CarParkEsherAccount?>> GetAccountByUsernameAsync(string username, CancellationToken cancellationToken)
+        {
+            return await _accountRepository.GetAccountByUsernameAsync(username, cancellationToken);
 
+        }
+        public async Task<Result<bool>> ValidateUserCredentialsAsync(string userName, string password, CancellationToken cancellationToken)
+        {
+            var _userName = (userName ?? string.Empty).Trim();
+            var _password = (password ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(_userName) ||
+                string.IsNullOrWhiteSpace(_password))
+            {
+                Result.Failure<bool>("Invalid username or password");
+            }
+            var userResult = await _accountRepository.GetAccountByUsernameAsync( _userName, cancellationToken);
+            if (userResult.IsFailure)
+            {
+                return Result.Failure<bool>(userResult.Error);
+            }
+            var _user = userResult.Value;
+            if (_user == null)
+            {
+                return Result.Failure<bool>("Invalid username or password");
+            }
+
+           
+
+            if (!_user.IsActive)
+            {
+                return Result.Failure<bool>("Invalid user account");
+            }
+            if (_user.IsLocked)
+            {
+                return Result.Failure<bool>("User account locked out");
+            }
+            var expectedPassword = _passwordHasher.HashPassword(_user, _password);
+            var verificationResult = _passwordHasher.VerifyHashedPassword(_user, _user.Password, _password);
+
+            if (verificationResult == PasswordVerificationResult.Success)
+            {
+                return Result.Success<bool>(true);
+            }
+            return Result.Failure<bool>("Invalid username or password");
+        }
         public async Task<ContextResult<EsherCarParkrRegistrationResponseDto>> CreateAccountAsync(EsherCarParkRegistrationRequestDto request, CancellationToken cancellationToken)
         {
             var esherCarParkRegistrationResponse = EsherCarParkrRegistrationResponseDto.Create(request);
@@ -24,7 +67,7 @@ namespace TG.CarParkEsher.Booking
             {
                 return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure(esherCarParkRegistrationResponse, false);
             }
-            var foundEmployee = await _userRepository.GetAccountAsync(request.FirstName, request.LastName, request.EmplyeeId, cancellationToken);
+            var foundEmployee = await _accountRepository.GetAccountAsync(request.FirstName, request.LastName, request.EmplyeeId, cancellationToken);
             if (foundEmployee.IsFailure)
             {
                 _logger.LogWarning("Account not found for {FirstName} {LastName} with EmployeeId {EmployeeId}", request.FirstName, request.LastName, request.EmplyeeId);
@@ -39,7 +82,7 @@ namespace TG.CarParkEsher.Booking
                 var errors = new List<ErrorDto> { new ErrorDto { ErrorID = "RegistrationFailed", ErrorDetail = "Problem with details, make sure correct details are supplied" } };
                 return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure( esherCarParkRegistrationResponse, true);
             }
-            var createdAccount = await _userRepository.CreateAccountAsync(newAccountForCreate.Value, cancellationToken);
+            var createdAccount = await _accountRepository.CreateAccountAsync(newAccountForCreate.Value, cancellationToken);
             if (createdAccount.IsFailure)
             {
                 _logger.LogError("Failed to save new account for {FirstName} {LastName} with EmployeeId {EmployeeId}: {Error}", request.FirstName, request.LastName, request.EmplyeeId, createdAccount.Error);
@@ -66,7 +109,7 @@ namespace TG.CarParkEsher.Booking
                                                                      esherEmployeeContact.FirstName,
                                                                      esherEmployeeContact.LastName,
                                                                      esherEmployeeContact.EmployeeId,
-                                                                     salt);
+                                                                     salt, true, false);
              
             if (newAccountResult.IsFailure)
             {
@@ -84,5 +127,7 @@ namespace TG.CarParkEsher.Booking
             RandomNumberGenerator.Fill(saltBytes);
             return Convert.ToBase64String(saltBytes);
         }
+
+        
     }
 }

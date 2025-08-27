@@ -8,7 +8,61 @@ namespace TG.CarParkEsher.Booking
         public AccountRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
+        public async Task<Result<CarParkEsherAccount?>> GetAccountByUsernameAsync(string username, CancellationToken cancellationToken)
+        {
+            CarParkEsherAccount? carParkEsherAccount = null;
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return Result.Failure<CarParkEsherAccount?>("Username cannot be empty."));
+            }
+            try
+            {
+                using (var connection = GetConnection())
+                {
+                    await connection.OpenAsync(cancellationToken);
+                    var command = connection.CreateCommand();
+                    command.CommandText = @"SELECT EmployeeId, ContactId, FirstName, LastName, VehicleType, Salt, PasswordHash, Active, FROM v_employee_contact_account WHERE  EmployeeId = $EmployeeId";
 
+                    var employeeIdParam = command.CreateParameter();
+                    employeeIdParam.ParameterName = "$EmployeeId";
+                    employeeIdParam.Value = username;
+                    command.Parameters.Add(employeeIdParam);
+
+                   
+
+                    using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+                    {
+                        if (await reader.ReadAsync(cancellationToken))
+                        {
+                            var empId = reader.GetString(reader.GetOrdinal("EmployeeId"));
+                            var contactId = reader.GetInt32(reader.GetOrdinal("ContactId"));
+                            var vehicleType = reader.IsDBNull(reader.GetOrdinal("VehicleType")) ? string.Empty : reader.GetString(reader.GetOrdinal("VehicleType"));
+                            var salt = reader.IsDBNull(reader.GetOrdinal("Salt")) ? string.Empty : reader.GetString(reader.GetOrdinal("Salt"));
+                            var passwordHash = reader.IsDBNull(reader.GetOrdinal("PasswordHash")) ? string.Empty : reader.GetString(reader.GetOrdinal("PasswordHash"));
+
+                            var fName = reader.GetString(reader.GetOrdinal("FirstName"));
+                            var lName = reader.GetString(reader.GetOrdinal("LastName"));
+                            var isActive = reader.GetBoolean(reader.GetOrdinal("Active"));
+                            var isBlocked = reader.GetBoolean(reader.GetOrdinal("IsBlocked"));
+                            carParkEsherAccount = new  CarParkEsherAccount(0,contactId, vehicleType, string.Empty, passwordHash, fName, lName, empId, string.Empty, isActive, isBlocked);
+                        }
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving account for username {Username}", username);
+                return  Result.Failure<CarParkEsherAccount?>($"{ex.Message}.{ex.InnerException?.Message}"));
+            }
+            if (carParkEsherAccount == null)
+            {
+                return  Result.Failure<CarParkEsherAccount?>("Account not found."));
+            }
+            return Result.Success<CarParkEsherAccount?>(carParkEsherAccount));
+
+        }
         public async Task<Result<CarParkEsherAccount?>> CreateAccountAsync(CarParkEsherAccount carParkEsherAccountValue, CancellationToken cancellationToken)
         {
           CarParkEsherAccount? carParkEsherAccount = null;
@@ -80,7 +134,7 @@ namespace TG.CarParkEsher.Booking
                                 var firstName = reader.GetString(reader.GetOrdinal("FirstName"));
                                 var lastName = reader.GetString(reader.GetOrdinal("LastName"));
                                 
-                                carParkEsherAccount = new CarParkEsherAccount(0, 0, string.Empty, string.Empty, string.Empty, firstName, lastName, string.Empty, string.Empty);
+                                carParkEsherAccount = new CarParkEsherAccount(0, 0, string.Empty, string.Empty, string.Empty, firstName, lastName, string.Empty, string.Empty, true, false);
                             }
 
                         }
@@ -155,5 +209,7 @@ namespace TG.CarParkEsher.Booking
             }
             return Result.Success<CarParkEsherEmployeeContact>(contact);
         }
+
+        
     }
 }

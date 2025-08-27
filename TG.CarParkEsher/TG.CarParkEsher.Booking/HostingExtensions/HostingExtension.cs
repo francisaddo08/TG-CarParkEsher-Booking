@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 
 namespace TG.CarParkEsher.Booking
 {
@@ -41,7 +42,7 @@ namespace TG.CarParkEsher.Booking
 
             });
 
-
+            builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
             builder.Services.AddHttpContextAccessor();
             builder.AddConfigurationsOptions();
             builder.Services.AddScoped<IPasswordHasher<CarParkEsherAccount>, PasswordHasher<CarParkEsherAccount>>();

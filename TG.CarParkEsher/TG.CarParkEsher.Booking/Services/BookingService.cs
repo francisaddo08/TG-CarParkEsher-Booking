@@ -38,6 +38,7 @@ namespace TG.CarParkEsher.Booking
 
             return ContextResult<EsherCarParkBookingResponseDto>.Success(esherCarParkBookingResponse);
         }
+
         private async Task<Result<CarParkEsherBooking>> NewBookingAsync(EsherCarParkBookingRequestDto bookingRequest)
         {
 

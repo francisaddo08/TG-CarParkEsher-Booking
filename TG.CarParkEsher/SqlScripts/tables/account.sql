@@ -4,4 +4,6 @@ CREATE TABLE "account" (
 "vehicletype" NVARCHAR(20) NOT NULL,
 "password" TEXT NOT NULL,
  "salt" TEXT NOT NULL UNIQUE,
- "passwordhash" TEXT NOT NULL UNIQUE);
+ "passwordhash" TEXT NOT NULL UNIQUE,
+  "isactive" BOOLEAN DEFAULT 1,
+  "isblocked" BOOLEAN DEFAULT 0);
