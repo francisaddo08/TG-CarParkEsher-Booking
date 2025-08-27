@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 
-namespace TG.CarParkEsher.Booking.Domain.Entities
+namespace TG.CarParkEsher.Booking
 {
     public class CarParkEsherDaysOfWeek : Entity<int>
     {

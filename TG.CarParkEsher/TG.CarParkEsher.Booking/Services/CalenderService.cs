@@ -27,7 +27,7 @@ namespace TG.CarParkEsher.Booking
             }
 
         }
-        public HashSet<EsherCarParkDayInfo> WeekDays()
+        public HashSet<CarParkEsherDayInfo> WeekDays()
         {
 
             DateTime Monday = DateTime.Now.StartOfWeek(DayOfWeek.Monday);
@@ -38,15 +38,15 @@ namespace TG.CarParkEsher.Booking
             DateTime Saturday = Monday.AddDays(5);
             DateTime Sunday = Monday.AddDays(6);
 
-            HashSet<EsherCarParkDayInfo> WeekDates = new HashSet<EsherCarParkDayInfo>()
+            HashSet<CarParkEsherDayInfo> WeekDates = new HashSet<CarParkEsherDayInfo>()
                 {
-                  new EsherCarParkDayInfo(DayOfWeek.Monday.ToString(), 1,Monday),
-                  new EsherCarParkDayInfo(DayOfWeek.Tuesday.ToString(),2, Tuesday),
-                  new EsherCarParkDayInfo(DayOfWeek.Wednesday.ToString(),3, Wednesday),
-                  new EsherCarParkDayInfo(DayOfWeek.Thursday.ToString(), 4,Thursday),
-                  new EsherCarParkDayInfo(DayOfWeek.Friday.ToString(), 5,Friday),
-                  new EsherCarParkDayInfo(DayOfWeek.Saturday.ToString(),6, Saturday),
-                  new EsherCarParkDayInfo(DayOfWeek.Sunday.ToString(), 7,Sunday)
+                  new CarParkEsherDayInfo(DayOfWeek.Monday.ToString(), 1,Monday),
+                  new CarParkEsherDayInfo(DayOfWeek.Tuesday.ToString(),2, Tuesday),
+                  new CarParkEsherDayInfo(DayOfWeek.Wednesday.ToString(),3, Wednesday),
+                  new CarParkEsherDayInfo(DayOfWeek.Thursday.ToString(), 4,Thursday),
+                  new CarParkEsherDayInfo(DayOfWeek.Friday.ToString(), 5,Friday),
+                  new CarParkEsherDayInfo(DayOfWeek.Saturday.ToString(),6, Saturday),
+                  new CarParkEsherDayInfo(DayOfWeek.Sunday.ToString(), 7,Sunday)
                 };
 
             return WeekDates;

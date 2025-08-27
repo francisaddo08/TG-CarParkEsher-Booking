@@ -8,7 +8,7 @@ namespace TG.CarParkEsher.Booking
         public CalenderRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
-        public async Task<Result<bool>> UpdateDaysOfWeek(HashSet<EsherCarParkDayInfo> esherCarParkDayInfos, CancellationToken cancellationToken)
+        public async Task<Result<bool>> UpdateDaysOfWeek(HashSet<CarParkEsherDayInfo> esherCarParkDayInfos, CancellationToken cancellationToken)
         {
            
             try
@@ -57,9 +57,9 @@ namespace TG.CarParkEsher.Booking
             }
             return Result.Success<bool>(true);
         }
-        public async Task<Result<HashSet<EsherCarParkDayInfo>>> GetDaysOfWeek(CancellationToken cancellationToken)
+        public async Task<Result<HashSet<CarParkEsherDayInfo>>> GetDaysOfWeek(CancellationToken cancellationToken)
         {
-            HashSet<EsherCarParkDayInfo> daysOfWeek = new HashSet<EsherCarParkDayInfo>();
+            HashSet<CarParkEsherDayInfo> daysOfWeek = new HashSet<CarParkEsherDayInfo>();
             try
             {
                 using (var connection = GetConnection())
@@ -75,7 +75,7 @@ namespace TG.CarParkEsher.Booking
                             var dayName = reader.GetString(1);
                             var dayNumber = reader.GetInt32(2);
                             var dateValue = reader.GetDateTime(3);
-                            daysOfWeek.Add(new EsherCarParkDayInfo(dayName, dayNumber, dateValue));
+                            daysOfWeek.Add(new CarParkEsherDayInfo(dayName, dayNumber, dateValue));
                         }
                     }
 
@@ -85,9 +85,9 @@ namespace TG.CarParkEsher.Booking
             catch (Exception ex)
             {
 
-                return Result.Failure<HashSet<EsherCarParkDayInfo>>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
+                return Result.Failure<HashSet<CarParkEsherDayInfo>>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
             }
-            return Result.Success<HashSet<EsherCarParkDayInfo>>(daysOfWeek);
+            return Result.Success<HashSet<CarParkEsherDayInfo>>(daysOfWeek);
         }
 
     }

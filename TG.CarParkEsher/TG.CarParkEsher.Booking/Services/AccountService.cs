@@ -1,4 +1,6 @@
-﻿namespace TG.CarParkEsher.Booking.HostingExtensions
+﻿using TG.CarParkEsher.Booking.Domain.Entities;
+
+namespace TG.CarParkEsher.Booking
 {
     public sealed class AccountService : IAccountService
     {
@@ -17,10 +19,22 @@
             {
                 return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure(esherCarParkRegistrationResponse, false);
             }
-            var existingUser = await _userRepository.GetAccountAsync(request.FirstName, request.LastName, request.EmplyeeId, cancellationToken);
+            var foundEmployee = await _userRepository.GetAccountAsync(request.FirstName, request.LastName, request.EmplyeeId, cancellationToken);
+            if (foundEmployee.IsFailure)
+            {
+                _logger.LogWarning("Account not found for {FirstName} {LastName} with EmployeeId {EmployeeId}", request.FirstName, request.LastName, request.EmplyeeId);
+                return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure("Registration failed Problem with your details, Ensure your details are correct", true);
+            }
+            var newAccountForCreate = newAccount(foundEmployee.Value, request);
 
 
 
+
+        }
+
+        private async Task<Result<CarParkEsherAccount>> object newAccount(CarParkEsherEmployeeContact value, EsherCarParkRegistrationRequestDto request) 
+        {
+            throw new NotImplementedException();
         }
     }
 }

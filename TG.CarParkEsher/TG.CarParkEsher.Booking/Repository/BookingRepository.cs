@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Options;
 
-namespace TG.CarParkEsher.Booking.HostingExtensions
+namespace TG.CarParkEsher.Booking
 {
     public sealed class BookingRepository : BaseRepository, IBookingRepository
     {
@@ -10,7 +10,7 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
         }
         public async Task<Result<CarParkEsherBooking?>> CreateBookingAsync(CarParkEsherBooking bookingForCreate, CancellationToken cancellationToken)
         {
-           CarParkEsherBooking? booking = null;
+            CarParkEsherBooking? carParkEsherBooking = null;
             try
             {
                 using (var connection = GetConnection())
@@ -20,13 +20,14 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
                     {
 
                         var command = connection.CreateCommand();
-                       
+
 
                         command.CommandText = @"INSERT INTO booking (bookee_id, dateofbooking, dayofweek_id, parkingspace_id, parkingstructure_id) 
                                                 VALUES ($bookeeid, $dateofbooking, $dayofweekid, $parkingspaceid, $parkingstructureid)";
                         var bookeeIdParam = command.CreateParameter();
                         bookeeIdParam.ParameterName = "$bookeeid";
                         command.Parameters.Add(bookeeIdParam);
+
                         var dateOfBookingParam = command.CreateParameter();
                         dateOfBookingParam.ParameterName = "$dateofbooking";
                         command.Parameters.Add(dateOfBookingParam);
@@ -49,18 +50,29 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
                         parkingStructureIdParam.Value = bookingForCreate.ParkingStructureId;
                         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 
+                        command.CommandText = @"SELECT BookingId, EmployeeId,ContatcId,FirstName,LastName,ParkingSpace,DayName,DateValue
+                                               FROM  v_employee_contact_booking
+                                               WHERE EmployeeId = $bookeeid
+                                                ORDER BY b.booking_id DESC
+                                                LIMIT 1";
+                        using (var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+                        {
+                         while (reader.Read()) 
+                         {
+                           var bookingId = reader.GetInt32(reader.GetOrdinal("BookingId"));
+                           var employeeId = reader.GetString(reader.GetOrdinal("EmployeeId"));
+                                var contactId = reader.GetInt32(reader.GetOrdinal("ContatcId"));
+                                var firstName = reader.GetString(reader.GetOrdinal("FirstName"));
+                                var lastName = reader.GetString(reader.GetOrdinal("LastName"));
+                                var parkingSpace = reader.GetInt32(reader.GetOrdinal("ParkingSpace"));
+                                var dayName = reader.GetString(reader.GetOrdinal("DayName"));
+                                var dateValue = reader.GetDateTime(reader.GetOrdinal("DateValue"));
+                                carParkEsherBooking = new CarParkEsherBooking(bookingId, contactId, dateValue, dayName, parkingSpace, 0);
 
+                            }
+                        }
 
-                        //var lastInsertIdCommand = connection.CreateCommand();
-                        //lastInsertIdCommand.CommandText = @"WITH lastid AS (SELECT last_insert_rowid()) 
-                        //                                    SELECT bookingid, bookee_id, datebooked, parkingspace_id, parkingstructure_id, datevalue, dayname
-                        //                                    FROM booking
-                        //                                    inner join daysofweek on booking.dayofweek_id = daysofweek.id
-                        //                                    WHERE bookingid = lastid";
-
-                        //var lastInsertId =  await lastInsertIdCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-
-                        transaction.Commit();
+                            transaction.Commit();
 
                     }
                 }
@@ -71,10 +83,14 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
 
                 return Result.Failure<CarParkEsherBooking?>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
             }
-            return Result.Success<CarParkEsherBooking?>(booking);
+            if (carParkEsherBooking == null)
+            {
+                return Result.Failure<CarParkEsherBooking?>("Booking could not be created.");
+            }
+            return Result.Success<CarParkEsherBooking?>(carParkEsherBooking);
 
         }
-        public async Task<bool>  UpdateDaysOfWeek()
+        public async Task<bool> UpdateDaysOfWeek()
         {
             try
             {
@@ -126,6 +142,6 @@ namespace TG.CarParkEsher.Booking.HostingExtensions
             return Result.Success(availableSlots);
         }
 
-       
+
     }
 }
