@@ -75,6 +75,21 @@ namespace TG.CarParkEsher.Booking
                 esherCarParkRegistrationResponse.SetValidation(false, errors);
                 return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure(esherCarParkRegistrationResponse, true);
             }
+            var existingAccount = await _accountRepository.GetAccountByContactIdAsync(foundEmployee.Value.ContactId, cancellationToken);
+            if (existingAccount.IsFailure)
+            {
+                _logger.LogError("Failed to check existing account for ContactId {ContactId}: {Error}", foundEmployee.Value.ContactId, existingAccount.Error);
+                var errors = new List<ErrorDto> { new ErrorDto { ErrorID = "RegistrationFailed", ErrorDetail = ErrorMessages.InternalServerError } };
+                esherCarParkRegistrationResponse.SetValidation(false, errors);
+                return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure(esherCarParkRegistrationResponse, true);
+            }
+            if(existingAccount.Value)
+            {
+                _logger.LogWarning("Account already exists for {FirstName} {LastName} with EmployeeId {EmployeeId}", request.FirstName, request.LastName, request.EmplyeeId);
+                var errors = new List<ErrorDto> { new ErrorDto { ErrorID = "AccountExists", ErrorDetail = ErrorMessages.AccountCreationConflict} };
+                esherCarParkRegistrationResponse.SetValidation(false, errors);
+                return ContextResult<EsherCarParkrRegistrationResponseDto>.Failure(esherCarParkRegistrationResponse, false);
+            }
             var newAccountForCreate = await newAccount(foundEmployee.Value, request);
             if (newAccountForCreate.IsFailure)
             {

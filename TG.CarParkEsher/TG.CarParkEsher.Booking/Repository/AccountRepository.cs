@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Options;
+using System.Data;
 
 namespace TG.CarParkEsher.Booking
 {
@@ -7,6 +8,49 @@ namespace TG.CarParkEsher.Booking
     {
         public AccountRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
+        }
+        public async Task<Result<bool>> GetAccountByContactIdAsync(int contactId, CancellationToken cancellationToken)
+        {
+            bool isFound = false;
+            if (contactId <= 0)
+            {
+                return Result.Failure<bool>("Contact ID must be a positive integer.");
+            }
+            try
+            {
+                using (var connection = GetConnection())
+                {
+                    await connection.OpenAsync(cancellationToken);
+                    var command = connection.CreateCommand();
+                    command.CommandText = @"SELECT contact_id FROM account WHERE  contact_id = $ContactId";
+
+                    var contactIdParam = command.CreateParameter();
+                    contactIdParam.ParameterName = "$ContactId";
+                    contactIdParam.Value = contactId;
+                    command.Parameters.Add(contactIdParam);
+
+
+
+                    using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+                    {
+                        if (await reader.ReadAsync(cancellationToken))
+                        {
+                            isFound = reader.IsDBNull(reader.GetOrdinal("contact_id"));
+
+
+                        }
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving account for username");
+                return Result.Failure<bool>($"{ex.Message}.{ex.InnerException?.Message}");
+            }
+            return Result.Success<bool>(isFound);
+
         }
         public async Task<Result<CarParkEsherAccount?>> GetAccountByUsernameAsync(string username, CancellationToken cancellationToken)
         {
@@ -95,18 +139,7 @@ namespace TG.CarParkEsher.Booking
                         passwordHashParam.ParameterName = "$passwordhash";
                         command.Parameters.Add(passwordHashParam);
 
-                        //var firstNameParam = command.CreateParameter();
-                        //firstNameParam.ParameterName = "$firstname";
-                        //command.Parameters.Add(firstNameParam);
-
-                        //var lastNameParam = command.CreateParameter();
-                        //lastNameParam.ParameterName = "$lastname";
-                        //command.Parameters.Add(lastNameParam);
-
-                        //var employeeIdParam = command.CreateParameter();
-                        //employeeIdParam.ParameterName = "$employeeid";
-                        //command.Parameters.Add(employeeIdParam);
-
+                       
                         contactIdParam.Value = carParkEsherAccountValue.ContactId;
                         vehicleTypeParam.Value = carParkEsherAccountValue.VehicleType;
                         passwordParam.Value = carParkEsherAccountValue.Password;
@@ -114,10 +147,6 @@ namespace TG.CarParkEsher.Booking
                         passwordHashParam.Value = carParkEsherAccountValue.PasswordHash;
                        
                        
-
-                        //firstNameParam.Value = value.FirstName;
-                        //lastNameParam.Value = value.LastName;
-                        //employeeIdParam.Value = value.EmployeeId;
                         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 
 
