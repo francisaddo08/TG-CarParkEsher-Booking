@@ -1,5 +1,6 @@
 CREATE TABLE "account" (
 "id" INTEGER NOT NULL CONSTRAINT "[PK_NAME]" PRIMARY KEY AUTOINCREMENT,
+"contact_id" INTEGER REFERENCES contact(contactid),
 "vehicletype" NVARCHAR(20) NOT NULL,
 "password" TEXT NOT NULL,
  "salt" TEXT NOT NULL UNIQUE,
