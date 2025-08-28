@@ -41,8 +41,12 @@ namespace TG.CarParkEsher.Booking
 
         private async Task<Result<CarParkEsherBooking>> NewBookingAsync(EsherCarParkBookingRequestDto bookingRequest)
         {
-
-            return CarParkEsherBooking.Create(1, bookingRequest.DateBooked, bookingRequest.ParkingSpaceId, _defaultParkingStructureId);
+            var contactId = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.ContactId)?.Value;
+            if (string.IsNullOrWhiteSpace(contactId) || !int.TryParse(contactId, out int bookeeId))
+            {
+                return Result.Failure<CarParkEsherBooking>("Invalid contact id");
+            }
+            return CarParkEsherBooking.Create(bookeeId, bookingRequest.DateBooked, bookingRequest.ParkingSpaceId, _defaultParkingStructureId);
 
         }
         private async Task<CarParkEsherBooking?> CreateBookingAsync(CarParkEsherBooking bookingForCreate, CancellationToken cancellationToken)

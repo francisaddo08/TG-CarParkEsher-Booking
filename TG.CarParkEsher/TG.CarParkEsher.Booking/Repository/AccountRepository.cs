@@ -66,16 +66,14 @@ namespace TG.CarParkEsher.Booking
                 {
                     await connection.OpenAsync(cancellationToken);
                     var command = connection.CreateCommand();
-                    command.CommandText = @"SELECT EmployeeId, ContactId, FirstName, LastName, VehicleType, Salt, PasswordHash, IsActive, IsBlocked FROM v_employee_contact_account WHERE  EmployeeId = $EmployeeId";
+                    command.CommandText = @"SELECT EmployeeId, ContactId, FirstName, LastName, VehicleType, Salt, PasswordHash, IsActive, IsBlocked 
+                                               FROM v_employee_contact_account 
+                                               WHERE  EmployeeId = $EmployeeId";
 
                     var employeeIdParam = command.CreateParameter();
                     employeeIdParam.ParameterName = "$EmployeeId";
                     employeeIdParam.Value = username;
                     command.Parameters.Add(employeeIdParam);
-
-                   
-
-                   
 
                     using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                     {

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
+using Newtonsoft.Json;
 
 namespace TG.CarParkEsher.Booking
 {
@@ -60,10 +61,13 @@ namespace TG.CarParkEsher.Booking
 
                 if (user != null && validationResult.Value == true)
                 {
+                   var bookings =   JsonConvert.SerializeObject(user.Bookings);
                     var claims = new List<Claim>()
                     {
                        new Claim(UserClaimTypes.BookSlot , "enabled"),
                        new Claim(UserClaimTypes.ViewAvailableSlot , "enabled"),
+                       new Claim( UserClaimTypes.ContactId, user.ContactId.ToString()),
+                       new Claim("bookings", bookings),
                     };
                     var identity = new ClaimsIdentity(claims, Scheme.Name);
                     var principal = new ClaimsPrincipal(identity);

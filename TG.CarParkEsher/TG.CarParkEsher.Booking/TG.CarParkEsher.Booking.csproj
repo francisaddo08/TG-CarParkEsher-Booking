@@ -10,6 +10,7 @@
     <PackageReference Include="CSharpFunctionalExtensions" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" />
+    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="SQLite" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
     <PackageReference Include="SQLitePCLRaw.core" />

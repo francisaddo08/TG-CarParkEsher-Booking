@@ -5,7 +5,21 @@ namespace TG.CarParkEsher.Booking
     public sealed class CarParkEsherAccount :Entity<int>
     {
     private const int DefaultId = 0;
-        public CarParkEsherAccount(int id, int contactId, string vehicleType, string password, string passwordHash, string firstName, string lastName, string employeeId, string salt, bool isActive, bool isBlocked) : base(id)
+        public CarParkEsherAccount
+        (
+         int id, 
+         int contactId,
+         string vehicleType,
+         string password, 
+         string passwordHash, 
+         string firstName,
+         string lastName,
+         string employeeId, 
+         string salt, 
+         bool isActive,
+         bool isBlocked,
+         IReadOnlyList<CarParkEsherBooking>? bookings = null
+         ) : base(id)
         {
             ContactId = contactId;
             VehicleType = vehicleType;
@@ -17,6 +31,7 @@ namespace TG.CarParkEsher.Booking
             Salt = salt;
             IsActive = isActive;
             IsLocked = isBlocked;
+            Bookings = bookings ?? new List<CarParkEsherBooking>();
         }
         public static Result<CarParkEsherAccount> Create( int contactId, string vehicleType, string password, string passwordHash, string firstName, string lastName, string employeeId, string salt, bool isActive, bool isBlocked)
         {
@@ -60,7 +75,8 @@ namespace TG.CarParkEsher.Booking
         public string EmployeeId { get; }
         public string Salt { get; }
         public bool IsActive { get; } 
-        public bool IsLocked { get; } 
+        public bool IsLocked { get; }
+        public IReadOnlyList<CarParkEsherBooking> Bookings { get; } 
 
 
     }

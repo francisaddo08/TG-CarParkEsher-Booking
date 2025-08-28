@@ -50,29 +50,35 @@ namespace TG.CarParkEsher.Booking
                         parkingStructureIdParam.Value = bookingForCreate.ParkingStructureId;
                         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 
-                        command.CommandText = @"SELECT BookingId, EmployeeId,ContatcId,FirstName,LastName,ParkingSpace,DayName,DateValue
+                        command.CommandText = @"SELECT BookingId, EmployeeId,ContactId,FirstName,LastName,ParkingSpace,DayName,DateValue
                                                FROM  v_employee_contact_booking
-                                               WHERE EmployeeId = $bookeeid
+                                               WHERE ContactId = $ContactId
                                                 ORDER BY BookingId DESC
                                                 LIMIT 1";
+                        var contactIdParam = command.CreateParameter();
+                        contactIdParam.ParameterName = "$ContactId";
+                        contactIdParam.Value = bookingForCreate.BookeeId;
+                        command.Parameters.Add(contactIdParam);
+
+
                         using (var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
                         {
-                         while (reader.Read()) 
-                         {
-                           var bookingId = reader.GetInt32(reader.GetOrdinal("BookingId"));
-                           var employeeId = reader.GetString(reader.GetOrdinal("EmployeeId"));
-                                var contactId = reader.GetInt32(reader.GetOrdinal("ContatcId"));
+                            while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                            {
+                                var bookingId = reader.GetInt32(reader.GetOrdinal("BookingId"));
+                                var employeeId = reader.GetString(reader.GetOrdinal("EmployeeId"));
+                                var contactId = reader.GetInt32(reader.GetOrdinal("ContactId"));
                                 var firstName = reader.GetString(reader.GetOrdinal("FirstName"));
                                 var lastName = reader.GetString(reader.GetOrdinal("LastName"));
                                 var parkingSpace = reader.GetInt32(reader.GetOrdinal("ParkingSpace"));
                                 var dayName = reader.GetString(reader.GetOrdinal("DayName"));
                                 var dateValue = reader.GetDateTime(reader.GetOrdinal("DateValue"));
-                                carParkEsherBooking = new CarParkEsherBooking(bookingId, contactId, dateValue, dayName, parkingSpace, 0);
+                                carParkEsherBooking = new CarParkEsherBooking(bookingId, contactId, dateValue, dayName, parkingSpace, bookingForCreate.ParkingStructureId);
 
                             }
                         }
 
-                            transaction.Commit();
+                        transaction.Commit();
 
                     }
                 }
