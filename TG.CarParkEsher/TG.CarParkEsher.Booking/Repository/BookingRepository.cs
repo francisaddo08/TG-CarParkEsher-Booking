@@ -11,7 +11,7 @@ namespace TG.CarParkEsher.Booking
         }
         public async Task<Result<DatabaseVerificationsFlags>> CheckParkingSpaceByIdAsync(int parkingSpaceId, DateTime dateBooked, bool bluebadge, bool ev, bool hybrid, CancellationToken cancellationToken)
         {
-            bool isFound = false;
+            DatabaseVerificationsFlags databaseVerificationsFlags = new DatabaseVerificationsFlags();
             if (parkingSpaceId <= 0)
             {
                 return Result.Failure<DatabaseVerificationsFlags>("parking space id must be a positive integer.");
@@ -20,50 +20,93 @@ namespace TG.CarParkEsher.Booking
             {
                 using (var connection = GetConnection())
                 {
-                    await connection.OpenAsync(cancellationToken);
-                    var command = connection.CreateCommand();
-                    command.CommandText = @"SELECT BookingId FROM v_employee_contact_booking WHERE  ParkingSpace = $ParkingSpaceId AND DateValue =$DateValue";
-
-                    var parkingSpaceIdParam = command.CreateParameter();
-                    parkingSpaceIdParam.ParameterName = "$ParkingSpaceId";
-                    parkingSpaceIdParam.Value = parkingSpaceId;
-                    command.Parameters.Add(parkingSpaceIdParam);
-
-                    var dateBookedParam = command.CreateParameter();
-                    dateBookedParam.ParameterName = "$DateValue";
-                    dateBookedParam.Value = dateBooked.Date;
-                    command.Parameters.Add(dateBookedParam);
-
-
-
-
-                    //var contactIdParam = command.CreateParameter();
-                    //contactIdParam.ParameterName = "$ContactId";
-                    //contactIdParam.Value = contactId;
-                    //command.Parameters.Add(contactIdParam);
-
-
-
-                    using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                    using (var transaction = connection.BeginTransaction())
                     {
-                        if (await reader.ReadAsync(cancellationToken))
+                        var command = connection.CreateCommand();
+                        command.CommandText = @"SELECT BookingId FROM v_employee_contact_booking WHERE  ParkingSpace = $ParkingSpaceId AND DateValue =$DateValue";
+
+                        var parkingSpaceIdParam = command.CreateParameter();
+                        parkingSpaceIdParam.ParameterName = "$ParkingSpaceId";
+                        parkingSpaceIdParam.Value = parkingSpaceId;
+                        command.Parameters.Add(parkingSpaceIdParam);
+
+                        var dateBookedParam = command.CreateParameter();
+                        dateBookedParam.ParameterName = "$DateValue";
+                        dateBookedParam.Value = dateBooked.Date;
+                        command.Parameters.Add(dateBookedParam);
+
+                        using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                         {
-                            int id = reader.GetInt32(reader.GetOrdinal(""));
-                            isFound = reader.HasRows;
-
-
+                            if (await reader.ReadAsync(cancellationToken))
+                            {
+                                int id = reader.GetInt32(reader.GetOrdinal("BookingId"));
+                                databaseVerificationsFlags.IsParkingSpaceAvailable = reader.HasRows ? false : true;
+                                databaseVerificationsFlags.IsDateAvailable = reader.HasRows ? false : true;
+                            }
                         }
+                        if(bluebadge)
+                        {
+                            command.CommandText = @"SELECT parkingspaceid 
+                                                  FROM parkingspace 
+                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking WHERE bluebadge =1) AND  bluebadge = 1";
+                            using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+                            {
+                                while (await reader.ReadAsync(cancellationToken))
+                                {
+                                   
+                                    var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
+                                  
+                                    databaseVerificationsFlags.AvaliableBlueBadgeBays.Add(id);
+                                    databaseVerificationsFlags.IsBlueBadgeValid = databaseVerificationsFlags.AvaliableBlueBadgeBays.Any() ? true : false;
+                                }
+                            }
+                        }
+                        if (ev)
+                        {
+                            command.CommandText = @"SELECT parkingspaceid 
+                                                  FROM parkingspace 
+                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking WHERE ev_exclusive =1) AND  ev_exclusive = 1";
+                            using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+                            {
+                                while (await reader.ReadAsync(cancellationToken))
+                                {
+
+                                    var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
+
+                                    databaseVerificationsFlags.AvaliableEvBays.Add(id);
+                                    databaseVerificationsFlags.IsEvValid = databaseVerificationsFlags.AvaliableBlueBadgeBays.Any() ? true : false;
+                                }
+                            }
+                        }
+                        if (hybrid)
+                        {
+                            command.CommandText = @"SELECT parkingspaceid 
+                                                  FROM parkingspace 
+                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking )";
+                            using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+                            {
+                                while (await reader.ReadAsync(cancellationToken))
+                                {
+
+                                    var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
+
+                                    databaseVerificationsFlags.AvaliableStandardBays.Add(id);
+                                    databaseVerificationsFlags.IsEvValid = databaseVerificationsFlags.AvaliableBlueBadgeBays.Any() ? true : false;
+                                }
+                            }
+                        }
+                        transaction.Commit();
                     }
                 }
-
-
+            
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving account for username");
                 return Result.Failure<DatabaseVerificationsFlags>($"{ex.Message}.{ex.InnerException?.Message}");
             }
-            return Result.Success<DatabaseVerificationsFlags>(isFound);
+            return Result.Success<DatabaseVerificationsFlags>(databaseVerificationsFlags);
 
         }
         public async Task<Result<CarParkEsherBooking?>> CreateBookingAsync(CarParkEsherBooking bookingForCreate, CancellationToken cancellationToken)

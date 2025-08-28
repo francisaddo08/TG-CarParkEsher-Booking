@@ -36,7 +36,7 @@ namespace TG.CarParkEsher.Booking
             var hybrid = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Hybrid)?.Value == "true";
 
            // var permitedBay = await _bookingRepository.GetPermittedParkingSpaces( );
-            var bayResult = await _bookingRepository.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId,bookingRequest.DateBooked, blueBadge, ev, hybrid cancellationToken);
+            var bayResult = await _bookingRepository.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId,bookingRequest.DateBooked, blueBadge, ev, hybrid, cancellationToken);
             if (bayResult.IsFailure)
             {
                 var errors = new List<ErrorDto>()
@@ -46,9 +46,39 @@ namespace TG.CarParkEsher.Booking
                 esherCarParkBookingResponse.SetValidation(false, errors);
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
             }
+            if(!bayResult.Value.IsParkingSpaceAvailable)
+            {
+              var errors = new List<ErrorDto>()
+                {
+                  new ErrorDto { ErrorID = "ParkingSpaceNotAvailable", ErrorDetail = "The selected parking space is not available for the chosen date." }
+                };
+                esherCarParkBookingResponse.SetValidation(false, errors);
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
 
+            }
+            if( bayResult.Value.IsBlueBadgeValid && !bayResult.Value.AvaliableBlueBadgeBays.Contains(bookingRequest.ParkingSpaceId))
+            {
+                var errors = new List<ErrorDto>()
+                {
+                  new ErrorDto { ErrorID = "InvalidBlueBadgeBay", ErrorDetail = "The selected parking space is not valid for Blue Badge holders." }
+                };
+                esherCarParkBookingResponse.SetValidation(false, errors);
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
 
-            var bookingForCreate = await NewBookingAsync(bookingRequest);
+            }
+
+            if (bayResult.Value.IsEvValid && !bayResult.Value.AvaliableEvBays.Contains(bookingRequest.ParkingSpaceId))
+            {
+                var errors = new List<ErrorDto>()
+                {
+                  new ErrorDto { ErrorID = "InvalidEvBay", ErrorDetail = "The selected parking space is not valid for Electric Vehicles." }
+                };
+                esherCarParkBookingResponse.SetValidation(false, errors);
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
+
+            }
+
+                var bookingForCreate = await NewBookingAsync(bookingRequest);
             if (bookingForCreate.IsFailure || bookingForCreate.Value is null)
             {
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(bookingForCreate.Error, true);
