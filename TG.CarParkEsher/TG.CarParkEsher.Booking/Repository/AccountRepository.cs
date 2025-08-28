@@ -56,6 +56,7 @@ namespace TG.CarParkEsher.Booking
         public async Task<Result<CarParkEsherAccount?>> GetAccountByUsernameAsync(string username, CancellationToken cancellationToken)
         {
             CarParkEsherAccount? carParkEsherAccount = null;
+            var bookings = new List<CarParkEsherBooking>();
             if (string.IsNullOrWhiteSpace(username))
             {
                 return Result.Failure<CarParkEsherAccount?>("Username cannot be empty.");
@@ -66,9 +67,12 @@ namespace TG.CarParkEsher.Booking
                 {
                     await connection.OpenAsync(cancellationToken);
                     var command = connection.CreateCommand();
-                    command.CommandText = @"SELECT EmployeeId, ContactId, FirstName, LastName, VehicleType, Salt, PasswordHash, IsActive, IsBlocked 
-                                               FROM v_employee_contact_account 
-                                               WHERE  EmployeeId = $EmployeeId";
+                    command.CommandText = @"SELECT v_employee_contact_account.EmployeeId, v_employee_contact_account.ContactId, v_employee_contact_account.FirstName, v_employee_contact_account.LastName, 
+                                               VehicleType, Salt, PasswordHash, IsActive, IsBlocked, 
+                                               ParkingSpace,DayName,DateValue ,BookingId
+                                               FROM v_employee_contact_account
+                                               LEFT JOIN v_employee_contact_booking ON v_employee_contact_account.ContactId = v_employee_contact_booking.ContactId
+                                               WHERE  v_employee_contact_account.EmployeeId = $EmployeeId";
 
                     var employeeIdParam = command.CreateParameter();
                     employeeIdParam.ParameterName = "$EmployeeId";
@@ -90,11 +94,26 @@ namespace TG.CarParkEsher.Booking
                             var isActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
                             var isBlocked = reader.GetBoolean(reader.GetOrdinal("IsBlocked"));
                             carParkEsherAccount = new  CarParkEsherAccount(0,contactId, vehicleType, string.Empty, passwordHash, fName, lName, empId, salt, isActive, isBlocked);
+
                         }
+                        
+                        do
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("BookingId")))
+                            {
+                                var bookingId = reader.GetInt32(reader.GetOrdinal("BookingId"));
+                                var parkingSpace = reader.GetInt32(reader.GetOrdinal("ParkingSpace"));
+                                var dayName = reader.GetString(reader.GetOrdinal("DayName"));
+                                var dateValue = reader.GetDateTime(reader.GetOrdinal("DateValue"));
+                                bookings.Add(new CarParkEsherBooking(bookingId, carParkEsherAccount!.ContactId, dateValue, dayName, parkingSpace, 0));
+                            }
+                        } while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false));
+                        
+
                     }
                 }
 
-
+                
             }
             catch (Exception ex)
             {
@@ -105,6 +124,7 @@ namespace TG.CarParkEsher.Booking
             {
                 return  Result.Failure<CarParkEsherAccount?>("Account not found.");
             }
+            carParkEsherAccount.Bookings = bookings;
             return Result.Success<CarParkEsherAccount?>(carParkEsherAccount);
 
         }

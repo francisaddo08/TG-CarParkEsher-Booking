@@ -18,7 +18,7 @@ namespace TG.CarParkEsher.Booking
          string salt, 
          bool isActive,
          bool isBlocked,
-         IReadOnlyList<CarParkEsherBooking>? bookings = null
+         List<CarParkEsherBooking>? bookings = null
          ) : base(id)
         {
             ContactId = contactId;
@@ -76,7 +76,7 @@ namespace TG.CarParkEsher.Booking
         public string Salt { get; }
         public bool IsActive { get; } 
         public bool IsLocked { get; }
-        public IReadOnlyList<CarParkEsherBooking> Bookings { get; } 
+        public List<CarParkEsherBooking> Bookings { get; set; } 
 
 
     }

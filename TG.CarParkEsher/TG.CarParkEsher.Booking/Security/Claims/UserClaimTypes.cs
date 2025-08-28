@@ -1,4 +1,5 @@
-﻿namespace TG.CarParkEsher.Booking
+﻿
+namespace TG.CarParkEsher.Booking
 {
     public static class UserClaimTypes
     {
@@ -6,5 +7,6 @@
         public const string ViewAvailableSlot = "view_slot";
         public const string BookSlot = "book_slot";
         public const string ContactId = "contactId";
+        public const string  Bookings = "bookings";
     }
 }

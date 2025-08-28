@@ -67,7 +67,7 @@ namespace TG.CarParkEsher.Booking
                        new Claim(UserClaimTypes.BookSlot , "enabled"),
                        new Claim(UserClaimTypes.ViewAvailableSlot , "enabled"),
                        new Claim( UserClaimTypes.ContactId, user.ContactId.ToString()),
-                       new Claim("bookings", bookings),
+                       new Claim( UserClaimTypes.Bookings, bookings),
                     };
                     var identity = new ClaimsIdentity(claims, Scheme.Name);
                     var principal = new ClaimsPrincipal(identity);

@@ -20,6 +20,17 @@ namespace TG.CarParkEsher.Booking
             {
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
             }
+            var bookings = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Bookings)?.Value;
+            var bookingsList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CarParkEsherBooking>>(bookings ?? "[]");
+            if (bookingsList != null && bookingsList.Any(b => b.DateBooked.Value.Date == bookingRequest.DateBooked.Date))
+            {
+                var errors = new List<ErrorDto>()
+                {
+                  new ErrorDto { ErrorID = "DuplicateBooking", ErrorDetail = "You already have a booking for the selected date." }
+                };
+                esherCarParkBookingResponse.SetValidation(false, errors);
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
+            }
             var bookingForCreate = await NewBookingAsync(bookingRequest);
             if (bookingForCreate.IsFailure || bookingForCreate.Value is null)
             {
