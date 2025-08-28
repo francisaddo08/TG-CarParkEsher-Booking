@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Options;
+using TG.CarParkEsher.Booking.Domain.Primitives;
 
 namespace TG.CarParkEsher.Booking
 {
@@ -8,12 +9,12 @@ namespace TG.CarParkEsher.Booking
         public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
-        public async Task<Result<bool>> CheckParkingSpaceByIdAsync(int parkingSpaceId, DateTime dateBooked, CancellationToken cancellationToken)
+        public async Task<Result<DatabaseVerificationsFlags>> CheckParkingSpaceByIdAsync(int parkingSpaceId, DateTime dateBooked, bool bluebadge, bool ev, bool hybrid, CancellationToken cancellationToken)
         {
             bool isFound = false;
             if (parkingSpaceId <= 0)
             {
-                return Result.Failure<bool>("parking space id must be a positive integer.");
+                return Result.Failure<DatabaseVerificationsFlags>("parking space id must be a positive integer.");
             }
             try
             {
@@ -60,9 +61,9 @@ namespace TG.CarParkEsher.Booking
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving account for username");
-                return Result.Failure<bool>($"{ex.Message}.{ex.InnerException?.Message}");
+                return Result.Failure<DatabaseVerificationsFlags>($"{ex.Message}.{ex.InnerException?.Message}");
             }
-            return Result.Success<bool>(isFound);
+            return Result.Success<DatabaseVerificationsFlags>(isFound);
 
         }
         public async Task<Result<CarParkEsherBooking?>> CreateBookingAsync(CarParkEsherBooking bookingForCreate, CancellationToken cancellationToken)

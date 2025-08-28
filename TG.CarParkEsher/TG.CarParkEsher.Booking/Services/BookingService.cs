@@ -36,7 +36,17 @@ namespace TG.CarParkEsher.Booking
             var hybrid = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Hybrid)?.Value == "true";
 
            // var permitedBay = await _bookingRepository.GetPermittedParkingSpaces( );
-            var bayResult = await _bookingRepository.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId,bookingRequest.DateBooked, cancellationToken);    
+            var bayResult = await _bookingRepository.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId,bookingRequest.DateBooked, blueBadge, ev, hybrid cancellationToken);
+            if (bayResult.IsFailure)
+            {
+                var errors = new List<ErrorDto>()
+                {
+                  new ErrorDto { ErrorID = "InvalidParkingSpace", ErrorDetail = bayResult.Error }
+                };
+                esherCarParkBookingResponse.SetValidation(false, errors);
+                return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
+            }
+
 
             var bookingForCreate = await NewBookingAsync(bookingRequest);
             if (bookingForCreate.IsFailure || bookingForCreate.Value is null)
