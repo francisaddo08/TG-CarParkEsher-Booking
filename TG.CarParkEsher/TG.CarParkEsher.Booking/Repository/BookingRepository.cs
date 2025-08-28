@@ -8,6 +8,63 @@ namespace TG.CarParkEsher.Booking
         public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
+        public async Task<Result<bool>> CheckParkingSpaceByIdAsync(int parkingSpaceId, DateTime dateBooked, CancellationToken cancellationToken)
+        {
+            bool isFound = false;
+            if (parkingSpaceId <= 0)
+            {
+                return Result.Failure<bool>("parking space id must be a positive integer.");
+            }
+            try
+            {
+                using (var connection = GetConnection())
+                {
+                    await connection.OpenAsync(cancellationToken);
+                    var command = connection.CreateCommand();
+                    command.CommandText = @"SELECT BookingId FROM v_employee_contact_booking WHERE  ParkingSpace = $ParkingSpaceId AND DateValue =$DateValue";
+
+                    var parkingSpaceIdParam = command.CreateParameter();
+                    parkingSpaceIdParam.ParameterName = "$ParkingSpaceId";
+                    parkingSpaceIdParam.Value = parkingSpaceId;
+                    command.Parameters.Add(parkingSpaceIdParam);
+
+                    var dateBookedParam = command.CreateParameter();
+                    dateBookedParam.ParameterName = "$DateValue";
+                    dateBookedParam.Value = dateBooked.Date;
+                    command.Parameters.Add(dateBookedParam);
+
+
+
+
+                    //var contactIdParam = command.CreateParameter();
+                    //contactIdParam.ParameterName = "$ContactId";
+                    //contactIdParam.Value = contactId;
+                    //command.Parameters.Add(contactIdParam);
+
+
+
+                    using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+                    {
+                        if (await reader.ReadAsync(cancellationToken))
+                        {
+                            int id = reader.GetInt32(reader.GetOrdinal(""));
+                            isFound = reader.HasRows;
+
+
+                        }
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving account for username");
+                return Result.Failure<bool>($"{ex.Message}.{ex.InnerException?.Message}");
+            }
+            return Result.Success<bool>(isFound);
+
+        }
         public async Task<Result<CarParkEsherBooking?>> CreateBookingAsync(CarParkEsherBooking bookingForCreate, CancellationToken cancellationToken)
         {
             CarParkEsherBooking? carParkEsherBooking = null;
@@ -148,6 +205,6 @@ namespace TG.CarParkEsher.Booking
             return Result.Success(availableSlots);
         }
 
-
+        
     }
 }

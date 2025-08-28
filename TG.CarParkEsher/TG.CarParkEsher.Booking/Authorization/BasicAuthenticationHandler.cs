@@ -69,6 +69,24 @@ namespace TG.CarParkEsher.Booking
                        new Claim( UserClaimTypes.ContactId, user.ContactId.ToString()),
                        new Claim( UserClaimTypes.Bookings, bookings),
                     };
+                    var permitedVehicleTypes = Enumeration.GetAll<VehicleType>().FirstOrDefault(vt => vt.Name.Equals(user.VehicleType, StringComparison.InvariantCultureIgnoreCase));
+                    if (permitedVehicleTypes != null)
+                    {
+                        if (permitedVehicleTypes.Name.Equals("BLUEBADGE", StringComparison.OrdinalIgnoreCase))
+                        {
+                            claims.Add(new Claim(UserClaimTypes.BlueBadge, "true"));
+                        }
+                        if (permitedVehicleTypes.Name.Equals("EV", StringComparison.OrdinalIgnoreCase))
+                        {
+                            claims.Add(new Claim(UserClaimTypes.EV, "true"));
+                        }
+                        if (permitedVehicleTypes.Name.Equals("HYBRID", StringComparison.OrdinalIgnoreCase))
+                        {
+                            claims.Add(new Claim(UserClaimTypes.Hybrid, "true"));
+                        }
+
+                    }
+                    
                     var identity = new ClaimsIdentity(claims, Scheme.Name);
                     var principal = new ClaimsPrincipal(identity);
                     var _ticket = new AuthenticationTicket(principal, Scheme.Name);

@@ -31,6 +31,13 @@ namespace TG.CarParkEsher.Booking
                 esherCarParkBookingResponse.SetValidation(false, errors);
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
             }
+            var blueBadge = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.BlueBadge)?.Value == "true";
+            var ev = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.EV)?.Value == "true";
+            var hybrid = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Hybrid)?.Value == "true";
+
+           // var permitedBay = await _bookingRepository.GetPermittedParkingSpaces( );
+            var bayResult = await _bookingRepository.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId,bookingRequest.DateBooked, cancellationToken);    
+
             var bookingForCreate = await NewBookingAsync(bookingRequest);
             if (bookingForCreate.IsFailure || bookingForCreate.Value is null)
             {

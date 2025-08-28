@@ -8,5 +8,8 @@ namespace TG.CarParkEsher.Booking
         public const string BookSlot = "book_slot";
         public const string ContactId = "contactId";
         public const string  Bookings = "bookings";
+        public const string BlueBadge = "bluebadge";
+        public const string EV = "ev";
+        public const string Hybrid = "hybrid";
     }
 }
