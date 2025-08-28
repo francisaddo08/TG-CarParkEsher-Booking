@@ -13,6 +13,19 @@
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
             await Task.Yield();
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var calenderService = scope.ServiceProvider.GetRequiredService<ICalenderService>();
+                var result = await calenderService.SeedDaysOfWeekTable(cancellationToken);
+                if (result.IsSuccess)
+                {
+
+                }
+                else
+                {
+                    _logger.LogError("Failed to retrieve days of the week: {Error}", result.Error);
+                }
+            }
             while (!cancellationToken.IsCancellationRequested)
             {
                 using (var scope = _serviceScopeFactory.CreateScope())

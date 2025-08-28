@@ -9,6 +9,59 @@ namespace TG.CarParkEsher.Booking
         public CalenderRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
+        public async Task<Result<bool>> SeedDaysOfWeekTable(HashSet<CarParkEsherDayInfo> esherCarParkDayInfos, CancellationToken cancellationToken)
+        {
+            try
+            {
+                using (var connection = GetConnection())
+                {
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        
+
+                        var command = connection.CreateCommand();
+                        command.CommandText = @"SELECT id FROM daysofweek LIMIT 1";
+                        await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return Result.Failure<bool>("Days of the week already seeded.");
+                            }
+                        }
+
+                        command.CommandText = @"INSERT INTO daysofweek (dayname, daynumber, datevalue) VALUES ($dayname, $daynumber, $datevalue)";
+                        var dayNameParam = command.CreateParameter();
+                        dayNameParam.ParameterName = "$dayname";
+                        command.Parameters.Add(dayNameParam);
+                        var dayNumberParam = command.CreateParameter();
+                        dayNumberParam.ParameterName = "$daynumber";
+                        command.Parameters.Add(dayNumberParam);
+                        var dateValueParam = command.CreateParameter();
+                        dateValueParam.ParameterName = "$datevalue";
+                        command.Parameters.Add(dateValueParam);
+                        foreach (var dayInfo in esherCarParkDayInfos)
+                        {
+                            dayNameParam.Value = dayInfo.DayName;
+                            dayNumberParam.Value = dayInfo.DayNumber;
+                            dateValueParam.Value = dayInfo.DateValue;
+                            await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                        }
+                        transaction.Commit();
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return Result.Failure<bool>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}");
+            }
+            return Result.Success<bool>(true);
+
+        }
         public async Task<Result<bool>> UpdateDaysOfWeek(HashSet<CarParkEsherDayInfo> esherCarParkDayInfos, CancellationToken cancellationToken)
         {
            
@@ -21,30 +74,31 @@ namespace TG.CarParkEsher.Booking
                     {
                        
                         var command = connection.CreateCommand();
-                        command.CommandText = @"DELETE FROM daysofweek";
+                        
                         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 
-                        command.CommandText = @"INSERT INTO daysofweek (id,dayname, daynumber, datevalue) VALUES ($id, $dayname, $daynumber, $datevalue)";
-                       var idParam = command.CreateParameter();
-                        idParam.ParameterName = "$id";
-                        command.Parameters.Add(idParam);
-                        var dayNameParam = command.CreateParameter();
-                        dayNameParam.ParameterName = "$dayname";
-                        command.Parameters.Add(dayNameParam);
-                        var dayNumberParam = command.CreateParameter();
-                        dayNumberParam.ParameterName = "$daynumber";
-                        command.Parameters.Add(dayNumberParam);
+                        command.CommandText = @"UPDATE daysofweek SET datevalue = $datevalue";
+                       
+
                         var dateValueParam = command.CreateParameter();
                         dateValueParam.ParameterName = "$datevalue";
                         command.Parameters.Add(dateValueParam);
+                        
+                        var dayofweekidParam = command.CreateParameter();
+                        dayofweekidParam.ParameterName = "$dayofweekid";
+                        command.Parameters.Add(dayofweekidParam);
+
                         foreach (var dayInfo in esherCarParkDayInfos)
                         {
-                            idParam.Value = dayInfo.DayNumber;
-                            dayNameParam.Value = dayInfo.DayName;
-                            dayNumberParam.Value = dayInfo.DayNumber;
+                            command.CommandText = @"UPDATE daysofweek SET datevalue = $datevalue WHERE id =$dayofweekid";
+                           
                             dateValueParam.Value = dayInfo.DateValue;
+                            dayofweekidParam.Value = dayInfo.DayNumber;
                             await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
                         }
+
+
+                        command.Parameters.Clear();
                         command.CommandText = @"SELECT parkingspaceid  FROM parkingspace";
                         List<int> parkingSpaceIds = new List<int>();
                         using (var reader = command.ExecuteReader())
@@ -57,13 +111,16 @@ namespace TG.CarParkEsher.Booking
                             }
 
                         }
-                        command.CommandText = @"INSERT INTO parkingspaceweekday (parkingspaceid, weekdayid) VALUES ($parkingspaceid, $datevalue, $isavailable)";
+                        command.Parameters.Clear();
+                        command.CommandText = @"INSERT INTO  weeklyparkingspace (parkingspace_id, dayofweek_id) VALUES ($parkingspaceid, $weekdayid)";
                         var parkingSpaceIdParam = command.CreateParameter();
                         parkingSpaceIdParam.ParameterName = "$parkingspaceid";
                         command.Parameters.Add(parkingSpaceIdParam);
+
                         var weekDayIdParam = command.CreateParameter();
-                        weekDayIdParam.ParameterName = "$datevalue";
+                        weekDayIdParam.ParameterName = "$weekdayid";
                         command.Parameters.Add(weekDayIdParam);
+
                         foreach (var parkingSpaceId in parkingSpaceIds)
                         {
                             foreach (var dayInfo in esherCarParkDayInfos)

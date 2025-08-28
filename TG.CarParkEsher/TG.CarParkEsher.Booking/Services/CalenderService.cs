@@ -9,6 +9,12 @@ namespace TG.CarParkEsher.Booking
         {
             _calenderRepository = calenderRepository ?? throw new ArgumentNullException(nameof(calenderRepository));
         }
+
+        public async Task<Result<bool>> SeedDaysOfWeekTable(CancellationToken cancellationToken)
+        { 
+            return await  _calenderRepository.SeedDaysOfWeekTable(WeekDays(), cancellationToken);
+        }
+
         public async Task<Result<bool>> UpdateWeekDaysAsync(CancellationToken cancellationToken)
         {
             try
