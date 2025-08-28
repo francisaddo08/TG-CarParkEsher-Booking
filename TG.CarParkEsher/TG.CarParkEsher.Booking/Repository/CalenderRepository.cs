@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Options;
+using TG.CarParkEsher.Booking.Domain.Primitives;
 
 namespace TG.CarParkEsher.Booking
 {
@@ -44,6 +45,36 @@ namespace TG.CarParkEsher.Booking
                             dateValueParam.Value = dayInfo.DateValue;
                             await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
                         }
+                        command.CommandText = @"SELECT parkingspaceid  FROM parkingspace";
+                        List<int> parkingSpaceIds = new List<int>();
+                        using (var reader = command.ExecuteReader())
+                        {
+                          
+                            while (reader.Read())
+                            {
+                                parkingSpaceIds.Add(reader.GetInt32(0));
+
+                            }
+
+                        }
+                        command.CommandText = @"INSERT INTO parkingspaceweekday (parkingspaceid, weekdayid) VALUES ($parkingspaceid, $datevalue, $isavailable)";
+                        var parkingSpaceIdParam = command.CreateParameter();
+                        parkingSpaceIdParam.ParameterName = "$parkingspaceid";
+                        command.Parameters.Add(parkingSpaceIdParam);
+                        var weekDayIdParam = command.CreateParameter();
+                        weekDayIdParam.ParameterName = "$datevalue";
+                        command.Parameters.Add(weekDayIdParam);
+                        foreach (var parkingSpaceId in parkingSpaceIds)
+                        {
+                            foreach (var dayInfo in esherCarParkDayInfos)
+                            {
+                                parkingSpaceIdParam.Value = parkingSpaceId;
+                                weekDayIdParam.Value = dayInfo.DayNumber;
+                                await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                            }
+                        }
+
+
                         transaction.Commit();
 
                     }

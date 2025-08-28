@@ -9,6 +9,66 @@ namespace TG.CarParkEsher.Booking
         public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
+        //public Task<Result<CarParkEsherDetail>> GetAllAvaliableBaysAsync(bool blueBadge, bool ev, bool hybrid, CancellationToken cancellationToken)
+        //{
+
+        //    List<CarParkEsherDetail> carParkEsherDetails = new List<CarParkEsherDetail>();
+        //    try
+        //    {
+        //        using (var connection = GetConnection())
+        //        {
+        //            connection.Open();
+        //            var command = connection.CreateCommand();
+        //            if (blueBadge)
+        //            {
+        //                command.CommandText = @"SELECT ParkingSpace, DayName, DateValue FROM parkingspace  ";
+        //            }
+        //            else
+        //            if (ev)
+        //            {
+        //                command.CommandText = @"SELECT parkingspaceid 
+        //                                          FROM parkingspace 
+        //                                          WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking WHERE ev_exclusive =1) AND  ev_exclusive = 1";
+        //            }
+        //            else
+        //            if (hybrid)
+        //            {
+        //                command.CommandText = @"SELECT parkingspaceid 
+        //                                          FROM parkingspace 
+        //                                          WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking )";
+        //            }
+        //            else
+        //            {
+        //                command.CommandText = @"SELECT parkingspaceid 
+        //                                          FROM parkingspace 
+        //                                          WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking ) AND  bluebadge = 0 AND ev_exclusive = 0";
+        //            }
+        //            using (var reader = command.ExecuteReader())
+        //            {
+        //                while (reader.Read())
+        //                {
+        //                    var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
+        //                    var carParkEsherDetail = CarParkEsherDetail.Create(id);
+        //                    if (carParkEsherDetail.IsSuccess && carParkEsherDetail.Value != null)
+        //                    {
+        //                        carParkEsherDetails.Add(carParkEsherDetail.Value);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Task.FromResult(Result.Failure<CarParkEsherDetail>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}"));
+        //    }
+        //    if (!carParkEsherDetails.Any())
+        //    {
+        //        return Task.FromResult(Result.Failure<CarParkEsherDetail>("No parking bays available."));
+        //    }
+           
+
+
+        //}
         public async Task<Result<DatabaseVerificationsFlags>> CheckParkingSpaceByIdAsync(int parkingSpaceId, DateTime dateBooked, bool bluebadge, bool ev, bool hybrid, CancellationToken cancellationToken)
         {
             DatabaseVerificationsFlags databaseVerificationsFlags = new DatabaseVerificationsFlags();
@@ -45,7 +105,7 @@ namespace TG.CarParkEsher.Booking
                                 databaseVerificationsFlags.IsDateAvailable = reader.HasRows ? false : true;
                             }
                         }
-                        if(bluebadge)
+                        if (bluebadge)
                         {
                             command.CommandText = @"SELECT parkingspaceid 
                                                   FROM parkingspace 
@@ -54,14 +114,15 @@ namespace TG.CarParkEsher.Booking
                             {
                                 while (await reader.ReadAsync(cancellationToken))
                                 {
-                                   
+
                                     var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
-                                  
+
                                     databaseVerificationsFlags.AvaliableBlueBadgeBays.Add(id);
                                     databaseVerificationsFlags.IsBlueBadgeValid = databaseVerificationsFlags.AvaliableBlueBadgeBays.Any() ? true : false;
                                 }
                             }
                         }
+                        else
                         if (ev)
                         {
                             command.CommandText = @"SELECT parkingspaceid 
@@ -79,6 +140,7 @@ namespace TG.CarParkEsher.Booking
                                 }
                             }
                         }
+                        else
                         if (hybrid)
                         {
                             command.CommandText = @"SELECT parkingspaceid 
@@ -96,10 +158,25 @@ namespace TG.CarParkEsher.Booking
                                 }
                             }
                         }
+                        else
+                        {
+                            command.CommandText = @"SELECT parkingspaceid 
+                                                  FROM parkingspace 
+                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking ) AND  bluebadge = 0 AND ev_exclusive = 0";
+                            using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+                            {
+                                while (await reader.ReadAsync(cancellationToken))
+                                {
+                                    var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
+                                    databaseVerificationsFlags.AvaliableStandardBays.Add(id);
+                                    databaseVerificationsFlags.IsEvValid = databaseVerificationsFlags.AvaliableBlueBadgeBays.Any() ? true : false;
+                                }
+                            }
+                        }
                         transaction.Commit();
                     }
                 }
-            
+
             }
             catch (Exception ex)
             {
@@ -249,6 +326,6 @@ namespace TG.CarParkEsher.Booking
             return Result.Success(availableSlots);
         }
 
-        
+
     }
 }

@@ -13,6 +13,17 @@ namespace TG.CarParkEsher.Booking
             _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
+        //public async Task<ContextResult<EsherCarParkAvaliableBayResponseDto>> GetAllAvaliableBaysAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
+        //{
+        //    var bookings = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Bookings)?.Value;
+        //    var bookingsList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CarParkEsherBooking>>(bookings ?? "[]");
+        //    var blueBadge = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.BlueBadge)?.Value == "true";
+        //    var ev = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.EV)?.Value == "true";
+        //    var hybrid = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Hybrid)?.Value == "true";
+
+            
+
+        //}
         public async Task<ContextResult<EsherCarParkBookingResponseDto>> CreateBookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken)
         {
             var esherCarParkBookingResponse = EsherCarParkBookingResponseDto.Create(bookingRequest);
@@ -119,6 +130,6 @@ namespace TG.CarParkEsher.Booking
 
         }
 
-
+       
     }
 }

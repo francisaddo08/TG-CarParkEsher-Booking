@@ -8,5 +8,6 @@ namespace TG.CarParkEsher.Booking
     {
         Task<Result<CarParkEsherBooking?>> CreateBookingAsync(CarParkEsherBooking bookingForCreate, CancellationToken cancellationToken);
         Task<Result<DatabaseVerificationsFlags>> CheckParkingSpaceByIdAsync(int parkingSpaceId, DateTime dateBooked, bool bluebadge, bool ev, bool hybrid, CancellationToken cancellationToken);
+        //Task<Result<CarParkEsherDetail>> GetAllAvaliableBaysAsync(bool blueBadge, bool ev, bool hybrid, CancellationToken cancellationToken);
     }
 }
