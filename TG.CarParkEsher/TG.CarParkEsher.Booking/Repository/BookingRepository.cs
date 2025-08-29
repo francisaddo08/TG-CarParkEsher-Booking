@@ -49,29 +49,65 @@ namespace TG.CarParkEsher.Booking
                     else
                     if (ev)
                     {
-                        command.CommandText = @"SELECT parkingspaceid 
-                                                  FROM parkingspace 
-                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking WHERE ev_exclusive =1) AND  ev_exclusive = 1";
+                        command.CommandText += " WHERE  EV = $ev";
+                        var evp = command.CreateParameter();
+                        evp.ParameterName = "$ev";
+                        evp.Value = ev;
+                        command.Parameters.Add(evp);
+
+
+                        var startDateParam = command.CreateParameter();
+                        startDateParam.ParameterName = "$startdate";
+                        startDateParam.Value = startDate.Date;
+                        command.Parameters.Add(startDateParam);
+                        if (endDate.HasValue)
+                        {
+                            command.CommandText += " AND DateValue BETWEEN $startdate AND $enddate";
+                            var endDateParam = command.CreateParameter();
+                            endDateParam.ParameterName = "$enddate";
+                            endDateParam.Value = endDate.Value.Date;
+                            command.Parameters.Add(endDateParam);
+                        }
+                        else
+                        {
+                            command.CommandText += " AND DateValue = $startdate";
+                            
+                        }
+
                     }
                     else
-                    if (hybrid)
                     {
-                        command.CommandText = @"SELECT parkingspaceid 
-                                                  FROM parkingspace 
-                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking )";
-                    }
-                    else
-                    {
-                        command.CommandText = @"SELECT parkingspaceid 
-                                                  FROM parkingspace 
-                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking ) AND  bluebadge = 0 AND ev_exclusive = 0";
+                        command.CommandText += "WHERE BlueBagde = 0 AND EV = 0";
+                        var startDateParam = command.CreateParameter();
+                        startDateParam.ParameterName = "$startdate";
+                        startDateParam.Value = startDate.Date;
+                        command.Parameters.Add(startDateParam);
+                        if (endDate.HasValue)
+                        {
+                            command.CommandText += " AND DateValue BETWEEN $startdate AND $enddate";
+                            var endDateParam = command.CreateParameter();
+                            endDateParam.ParameterName = "$enddate";
+                            endDateParam.Value = endDate.Value.Date;
+                            command.Parameters.Add(endDateParam);
+                        }
+                        else
+                        {
+                            command.CommandText += " AND DateValue = $startdate";
+                        }
                     }
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
                             var id = reader.GetInt32(reader.GetOrdinal("ParkingSpaceId"));
-                            var parkingStructureName = reader.GetInt32(reader.GetOrdinal("StructureName"));
+                            var parkingStructureName = reader.GetInt32(reader.GetOrdinal("structurename"));
+                            var blueBagde = reader.GetBoolean(reader.GetOrdinal("BlueBagde"));
+                            var evExclusive = reader.GetBoolean(reader.GetOrdinal("Ev"));
+                            var dateValue = reader.GetDateTime(reader.GetOrdinal("datevalue"));
+                            var dateName = reader.GetString(reader.GetOrdinal("dayname"));
+
+                            string vehicleType = blueBagde ? "Blue Badge" : evExclusive ? "EV Exclusive" : "Standard";
+                            carParkEsherDetails.Add(new CarParkEsherDetail( dateValue, dateName,id, vehicleType, string.Empty));
 
                         }
                     }

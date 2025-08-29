@@ -28,15 +28,15 @@ namespace TG.CarParkEsher.Booking
             {
                 return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Failure(avaliableParkingSpaces.Error);
             }
-            if (avaliableParkingSpaces.Value.Any())
-            {
-                return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Success(new List<EsherCarParkAvaliableBayResponseDto>());
-            }
 
-            var esherCarParkAvaliableBayResponse = new List<EsherCarParkAvaliableBayResponseDto>();
+            EsherCarParkAvaliableBayResponseDto esherCarParkAvaliableBayResponse = new(true,null);
 
 
-            return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Success(esherCarParkAvaliableBayResponse);
+            esherCarParkAvaliableBayResponse.ParkingSpaces = avaliableParkingSpaces.Value.Select(p => new EsherCarParkAvaliableBayDetailDto(p.ParkingSpaceId, p.DateAvaliable, p.Day, p.VehicleType,p.ColourCode)  ).ToList();
+
+
+
+            return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Success(new List<EsherCarParkAvaliableBayResponseDto> { esherCarParkAvaliableBayResponse });
 
 
 

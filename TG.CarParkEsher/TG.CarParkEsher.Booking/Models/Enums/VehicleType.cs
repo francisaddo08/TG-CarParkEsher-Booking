@@ -4,9 +4,9 @@
     {
         public static VehicleType EV = new(1, "EV");
         public static VehicleType FOSSILFUEL = new(2, "FOSSIL");
-        public static VehicleType HYBRID = new(3, "HYBRID");
+        //public static VehicleType HYBRID = new(3, "HYBRID");
         public static VehicleType BIKE = new(4, "BIKE");
-        public static VehicleType MOTORBIKE = new(5, "MOTORBIKE");
+        //public static VehicleType MOTORBIKE = new(5, "MOTORBIKE");
         public static VehicleType BLUEBADGE = new(6, "BLUEBADGE");
         public VehicleType(int id, string name) : base(id, name)
         {

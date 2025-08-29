@@ -7,7 +7,7 @@ namespace TG.CarParkEsher.Booking
         {
         }
 
-        public List<EsherCarParkAvaliableBayDetailDto> AvaliableBays { get; set; } = new List<EsherCarParkAvaliableBayDetailDto>();
+        public List<EsherCarParkAvaliableBayDetailDto> ParkingSpaces { get; set; } = new List<EsherCarParkAvaliableBayDetailDto>();
 
     }
 

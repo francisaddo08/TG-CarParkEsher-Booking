@@ -31,7 +31,7 @@ namespace TG.CarParkEsher.Booking.Controllers
             }
             return Ok(bookingresult.Result);
         }
-        [HttpPost("booking/avaliable-bays")]
+        [HttpPost("booking/avaliable-parkingspaces")]
         public async Task<ActionResult<EsherCarParkBookingResponseDto>> GetAvaliableBaysAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
         {
             var bookingresult = await _bookingService.GetAllAvaliableBaysAsync(request, cancellationToken);
