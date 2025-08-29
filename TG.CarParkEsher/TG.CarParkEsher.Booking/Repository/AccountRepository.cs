@@ -6,7 +6,7 @@ namespace TG.CarParkEsher.Booking
 {
     public class AccountRepository : BaseRepository, IAccountRepository
     {
-        public AccountRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
+        public AccountRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost) : base(logger, connectionOption, webHost)
         {
         }
         public async Task<Result<bool>> GetAccountByContactIdAsync(int contactId, CancellationToken cancellationToken)

@@ -6,7 +6,7 @@ namespace TG.CarParkEsher.Booking
 {
     public sealed class BookingRepository : BaseRepository, IBookingRepository
     {
-        public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
+        public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost) : base(logger, connectionOption, webHost)
         {
         }
         public Task<Result<List<CarParkEsherDetail>>> GetPermittedParkingSpaces(bool blueBadge, bool ev, bool hybrid, DateTime startDate, DateTime? endDate, CancellationToken cancellationToken)

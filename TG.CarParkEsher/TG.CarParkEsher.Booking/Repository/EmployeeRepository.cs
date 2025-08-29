@@ -5,7 +5,7 @@ namespace TG.CarParkEsher.Booking
 {
     public sealed class EmployeeRepository : BaseRepository
     {
-        public EmployeeRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
+        public EmployeeRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost) : base(logger, connectionOption, webHost)
         {
         }
 
