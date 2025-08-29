@@ -15,16 +15,30 @@ namespace TG.CarParkEsher.Booking
         }
         protected SqliteConnection GetConnection()
         {
-            var connectionString = _connectionOption.CurrentValue.ConnectionString;
-            if (string.IsNullOrWhiteSpace(connectionString))
+            
+
+            // Build absolute path
+            string dbPath = GetRootDirectory();
+            
+            if (string.IsNullOrWhiteSpace(dbPath))
             {
                 _logger.LogError("Connection string is not configured.");
                 throw new InvalidOperationException("Connection string is not configured.");
                 
             }
-            var connection = new SqliteConnection(connectionString);
+            var connection = new SqliteConnection(dbPath);
           
             return connection;
+        }
+        static string GetRootDirectory()
+        {
+            var d = Directory.GetCurrentDirectory();
+            while (!File.Exists(Path.Combine(d, "CarParkEsher.db")))
+            {
+                d = Path.GetDirectoryName(d);
+            }
+
+            return d;
         }
     }
 }
