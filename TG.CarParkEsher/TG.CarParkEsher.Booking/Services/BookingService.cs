@@ -13,17 +13,34 @@ namespace TG.CarParkEsher.Booking
             _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
-        //public async Task<ContextResult<EsherCarParkAvaliableBayResponseDto>> GetAllAvaliableBaysAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
-        //{
-        //    var bookings = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Bookings)?.Value;
-        //    var bookingsList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CarParkEsherBooking>>(bookings ?? "[]");
-        //    var blueBadge = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.BlueBadge)?.Value == "true";
-        //    var ev = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.EV)?.Value == "true";
-        //    var hybrid = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Hybrid)?.Value == "true";
+        public async Task<ContextResult<List<EsherCarParkAvaliableBayResponseDto>>> GetAllAvaliableBaysAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
+        {
+            var bookings = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Bookings)?.Value;
+            var bookingsList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CarParkEsherBooking>>(bookings ?? "[]");
+            var blueBadge = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.BlueBadge)?.Value == "true";
+            var ev = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.EV)?.Value == "true";
+            var hybrid = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Hybrid)?.Value == "true";
 
-            
 
-        //}
+
+            var avaliableParkingSpaces = await _bookingRepository.GetPermittedParkingSpaces(blueBadge, ev, hybrid, request.StartDate, request.EndDate, cancellationToken);
+            if (avaliableParkingSpaces.IsFailure)
+            {
+                return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Failure(avaliableParkingSpaces.Error);
+            }
+            if (avaliableParkingSpaces.Value.Any())
+            {
+                return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Success(new List<EsherCarParkAvaliableBayResponseDto>());
+            }
+
+            var esherCarParkAvaliableBayResponse = new List<EsherCarParkAvaliableBayResponseDto>();
+
+
+            return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Success(esherCarParkAvaliableBayResponse);
+
+
+
+        }
         public async Task<ContextResult<EsherCarParkBookingResponseDto>> CreateBookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken)
         {
             var esherCarParkBookingResponse = EsherCarParkBookingResponseDto.Create(bookingRequest);
@@ -46,8 +63,8 @@ namespace TG.CarParkEsher.Booking
             var ev = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.EV)?.Value == "true";
             var hybrid = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Hybrid)?.Value == "true";
 
-           // var permitedBay = await _bookingRepository.GetPermittedParkingSpaces( );
-            var bayResult = await _bookingRepository.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId,bookingRequest.DateBooked, blueBadge, ev, hybrid, cancellationToken);
+            // var permitedBay = await _bookingRepository.GetPermittedParkingSpaces( );
+            var bayResult = await _bookingRepository.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId, bookingRequest.DateBooked, blueBadge, ev, hybrid, cancellationToken);
             if (bayResult.IsFailure)
             {
                 var errors = new List<ErrorDto>()
@@ -57,9 +74,9 @@ namespace TG.CarParkEsher.Booking
                 esherCarParkBookingResponse.SetValidation(false, errors);
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
             }
-            if(!bayResult.Value.IsParkingSpaceAvailable)
+            if (!bayResult.Value.IsParkingSpaceAvailable)
             {
-              var errors = new List<ErrorDto>()
+                var errors = new List<ErrorDto>()
                 {
                   new ErrorDto { ErrorID = "ParkingSpaceNotAvailable", ErrorDetail = "The selected parking space is not available for the chosen date." }
                 };
@@ -67,7 +84,7 @@ namespace TG.CarParkEsher.Booking
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
 
             }
-            if( bayResult.Value.IsBlueBadgeValid && !bayResult.Value.AvaliableBlueBadgeBays.Contains(bookingRequest.ParkingSpaceId))
+            if (bayResult.Value.IsBlueBadgeValid && !bayResult.Value.AvaliableBlueBadgeBays.Contains(bookingRequest.ParkingSpaceId))
             {
                 var errors = new List<ErrorDto>()
                 {
@@ -89,7 +106,7 @@ namespace TG.CarParkEsher.Booking
 
             }
 
-                var bookingForCreate = await NewBookingAsync(bookingRequest);
+            var bookingForCreate = await NewBookingAsync(bookingRequest);
             if (bookingForCreate.IsFailure || bookingForCreate.Value is null)
             {
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(bookingForCreate.Error, true);
@@ -98,10 +115,10 @@ namespace TG.CarParkEsher.Booking
             if (createdBooking is null)
             {
                 var errors = new List<ErrorDto>()
-                { 
+                {
                   new ErrorDto { ErrorID = "BookingCreationFailed", ErrorDetail = "An error occurred while creating the booking. Please try again later." }
                 };
-                esherCarParkBookingResponse.SetValidation(false, errors );
+                esherCarParkBookingResponse.SetValidation(false, errors);
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse, true);
             }
 
@@ -130,6 +147,6 @@ namespace TG.CarParkEsher.Booking
 
         }
 
-       
+
     }
 }

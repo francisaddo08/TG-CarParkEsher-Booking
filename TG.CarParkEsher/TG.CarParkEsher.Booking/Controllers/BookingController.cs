@@ -31,20 +31,20 @@ namespace TG.CarParkEsher.Booking.Controllers
             }
             return Ok(bookingresult.Result);
         }
-        //[HttpPost("booking/avaliable-bays")]
-        //public async Task<ActionResult<EsherCarParkBookingResponseDto>> GetAvaliableBaysAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
-        //{
-        //    var bookingresult = await _bookingService.GetAllAvaliableBaysAsync(request, cancellationToken);
-        //    if (bookingresult.IsFailure)
-        //    {
-        //        if (bookingresult.IsServerError)
-        //        {
+        [HttpPost("booking/avaliable-bays")]
+        public async Task<ActionResult<EsherCarParkBookingResponseDto>> GetAvaliableBaysAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
+        {
+            var bookingresult = await _bookingService.GetAllAvaliableBaysAsync(request, cancellationToken);
+            if (bookingresult.IsFailure)
+            {
+                if (bookingresult.IsServerError)
+                {
 
-        //            return StatusCode(StatusCodes.Status500InternalServerError, bookingresult.Result);
-        //        }
-        //        return StatusCode(StatusCodes.Status406NotAcceptable, bookingresult.Result);
-        //    }
-        //    return Ok(bookingresult.Result);
-        //}
+                    return StatusCode(StatusCodes.Status500InternalServerError, bookingresult.Result);
+                }
+                return StatusCode(StatusCodes.Status406NotAcceptable, bookingresult.Result);
+            }
+            return Ok(bookingresult.Result);
+        }
     }
 }

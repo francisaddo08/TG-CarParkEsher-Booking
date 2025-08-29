@@ -9,66 +9,87 @@ namespace TG.CarParkEsher.Booking
         public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption) : base(logger, connectionOption)
         {
         }
-        //public Task<Result<CarParkEsherDetail>> GetAllAvaliableBaysAsync(bool blueBadge, bool ev, bool hybrid, CancellationToken cancellationToken)
-        //{
+        public Task<Result<List<CarParkEsherDetail>>> GetPermittedParkingSpaces(bool blueBadge, bool ev, bool hybrid, DateTime startDate, DateTime? endDate, CancellationToken cancellationToken)
+        {
 
-        //    List<CarParkEsherDetail> carParkEsherDetails = new List<CarParkEsherDetail>();
-        //    try
-        //    {
-        //        using (var connection = GetConnection())
-        //        {
-        //            connection.Open();
-        //            var command = connection.CreateCommand();
-        //            if (blueBadge)
-        //            {
-        //                command.CommandText = @"SELECT ParkingSpace, DayName, DateValue FROM parkingspace  ";
-        //            }
-        //            else
-        //            if (ev)
-        //            {
-        //                command.CommandText = @"SELECT parkingspaceid 
-        //                                          FROM parkingspace 
-        //                                          WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking WHERE ev_exclusive =1) AND  ev_exclusive = 1";
-        //            }
-        //            else
-        //            if (hybrid)
-        //            {
-        //                command.CommandText = @"SELECT parkingspaceid 
-        //                                          FROM parkingspace 
-        //                                          WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking )";
-        //            }
-        //            else
-        //            {
-        //                command.CommandText = @"SELECT parkingspaceid 
-        //                                          FROM parkingspace 
-        //                                          WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking ) AND  bluebadge = 0 AND ev_exclusive = 0";
-        //            }
-        //            using (var reader = command.ExecuteReader())
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
-        //                    var carParkEsherDetail = CarParkEsherDetail.Create(id);
-        //                    if (carParkEsherDetail.IsSuccess && carParkEsherDetail.Value != null)
-        //                    {
-        //                        carParkEsherDetails.Add(carParkEsherDetail.Value);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Task.FromResult(Result.Failure<CarParkEsherDetail>($"An error occurred while retrieving days of the week.{ex.Message} {ex.InnerException?.Message}"));
-        //    }
-        //    if (!carParkEsherDetails.Any())
-        //    {
-        //        return Task.FromResult(Result.Failure<CarParkEsherDetail>("No parking bays available."));
-        //    }
-           
+            List<CarParkEsherDetail> carParkEsherDetails = new List<CarParkEsherDetail>();
+            try
+            {
+                using (var connection = GetConnection())
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = @"SELECT * FROM v_avaliableparkingspaces ";
+                    if (blueBadge)
+                    {
+                        command.CommandText += " WHERE  BlueBagde = $bluebage ";
+                        var blueBadgeParam = command.CreateParameter();
+                        blueBadgeParam.ParameterName = "$bluebage";
+                        blueBadgeParam.Value = blueBadge;
+                        command.Parameters.Add(blueBadgeParam);
+
+                        var startDateParam = command.CreateParameter();
+                        startDateParam.ParameterName = "$startdate";
+                        startDateParam.Value = startDate.Date;
+                        command.Parameters.Add(startDateParam);
+                        if (endDate.HasValue) 
+                        {
+                            command.CommandText += " AND DateValue BETWEEN $startdate AND $enddate";
+                            var endDateParam = command.CreateParameter();
+                            endDateParam.ParameterName = "$enddate";
+                            endDateParam.Value = endDate.Value.Date;
+                            command.Parameters.Add(endDateParam);
+                        }
+                        else
+                        {
+                            command.CommandText += " AND DateValue = $startdate";
+                        }
+                        
+                    }
+                    else
+                    if (ev)
+                    {
+                        command.CommandText = @"SELECT parkingspaceid 
+                                                  FROM parkingspace 
+                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking WHERE ev_exclusive =1) AND  ev_exclusive = 1";
+                    }
+                    else
+                    if (hybrid)
+                    {
+                        command.CommandText = @"SELECT parkingspaceid 
+                                                  FROM parkingspace 
+                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking )";
+                    }
+                    else
+                    {
+                        command.CommandText = @"SELECT parkingspaceid 
+                                                  FROM parkingspace 
+                                                  WHERE parkingspaceid NOT IN(SELECT parkingspaceid FROM  v_parking_booking ) AND  bluebadge = 0 AND ev_exclusive = 0";
+                    }
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var id = reader.GetInt32(reader.GetOrdinal("ParkingSpaceId"));
+                            var parkingStructureName = reader.GetInt32(reader.GetOrdinal("StructureName"));
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(Result.Failure<List<CarParkEsherDetail>>($"An error occurred while retrieving parking bays.{ex.Message} {ex.InnerException?.Message}"));
+            }
+            if (!carParkEsherDetails.Any())
+            {
+                return Task.FromResult(Result.Failure<List<CarParkEsherDetail>>("No parking bays found."));
+            }
+            return Task.FromResult(Result.Success<List<CarParkEsherDetail>>(carParkEsherDetails));
 
 
-        //}
+
+        }
         public async Task<Result<DatabaseVerificationsFlags>> CheckParkingSpaceByIdAsync(int parkingSpaceId, DateTime dateBooked, bool bluebadge, bool ev, bool hybrid, CancellationToken cancellationToken)
         {
             DatabaseVerificationsFlags databaseVerificationsFlags = new DatabaseVerificationsFlags();
