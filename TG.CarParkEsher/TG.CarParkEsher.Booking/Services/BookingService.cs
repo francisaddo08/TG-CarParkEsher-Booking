@@ -21,25 +21,14 @@ namespace TG.CarParkEsher.Booking
             var ev = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.EV)?.Value == "true";
             var hybrid = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Hybrid)?.Value == "true";
 
-
-
             var avaliableParkingSpaces = await _bookingRepository.GetPermittedParkingSpaces(blueBadge, ev, hybrid, request.StartDate, request.EndDate, cancellationToken);
             if (avaliableParkingSpaces.IsFailure)
             {
                 return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Failure(avaliableParkingSpaces.Error);
             }
-
             EsherCarParkAvaliableBayResponseDto esherCarParkAvaliableBayResponse = new(true,null);
-
-
             esherCarParkAvaliableBayResponse.ParkingSpaces = avaliableParkingSpaces.Value.Select(p => new EsherCarParkAvaliableBayDetailDto(p.ParkingSpaceId, p.DateAvaliable, p.Day, p.VehicleType,p.ColourCode)  ).ToList();
-
-
-
             return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Success(new List<EsherCarParkAvaliableBayResponseDto> { esherCarParkAvaliableBayResponse });
-
-
-
         }
         public async Task<ContextResult<EsherCarParkBookingResponseDto>> CreateBookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken)
         {

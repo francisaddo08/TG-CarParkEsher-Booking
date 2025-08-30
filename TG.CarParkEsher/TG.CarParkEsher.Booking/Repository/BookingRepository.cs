@@ -106,8 +106,13 @@ namespace TG.CarParkEsher.Booking
                             var dateValue = reader.GetDateTime(reader.GetOrdinal("datevalue"));
                             var dateName = reader.GetString(reader.GetOrdinal("dayname"));
 
-                            string vehicleType = blueBagde ? "Blue Badge" : evExclusive ? "EV Exclusive" : "Standard";
-                            carParkEsherDetails.Add(new CarParkEsherDetail( dateValue, dateName,id, vehicleType, string.Empty));
+                            var vehicleTypes = Enumeration.GetAll<VehicleType>();
+                            var vehicleTypeEnum = blueBagde ? vehicleTypes.FirstOrDefault(v => v.Name == VehicleType.BLUEBADGE.Name) :
+                                                  evExclusive ? vehicleTypes.FirstOrDefault(v => v.Name == VehicleType.EV.Name) :
+                                                  vehicleTypes.FirstOrDefault(v => v.Name == VehicleType.FOSSILFUEL.Name);
+
+                           
+                            carParkEsherDetails.Add(new CarParkEsherDetail( dateValue, dateName,id, vehicleTypeEnum is null ? string.Empty : vehicleTypeEnum.Name, vehicleTypeEnum is null ? string.Empty : vehicleTypeEnum.ColourCode));
 
                         }
                     }
