@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace TG.CarParkEsher.Booking.Controllers
+namespace TG.CarParkEsher.Booking
 {
     [Tags("Account")]
     [Route("api/v1-0/tg")]
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly ILogger<BookingController> _logger;
+        private readonly ILoggingService _logger;
         private readonly IAccountService _accountService;
-        public AccountController(ILogger<BookingController> logger, IAccountService accountService)
+        public AccountController(ILoggingService logger, IAccountService accountService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
         }
-       [HttpPost("account/create-account")]
+        [HttpPost("account/create-account")]
         public async Task<ActionResult<EsherCarParkrRegistrationResponseDto>> CreateAccountAsync(EsherCarParkRegistrationRequestDto request, CancellationToken cancellationToken)
         {
             var userResult = await _accountService.CreateAccountAsync(request, cancellationToken);
@@ -22,6 +22,7 @@ namespace TG.CarParkEsher.Booking.Controllers
             {
                 if (userResult.IsServerError)
                 {
+
                     return StatusCode(StatusCodes.Status500InternalServerError, userResult.Result);
                 }
                 return StatusCode(StatusCodes.Status406NotAcceptable, userResult.Result);

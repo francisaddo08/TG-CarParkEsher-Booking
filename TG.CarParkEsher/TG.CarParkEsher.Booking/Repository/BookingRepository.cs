@@ -6,7 +6,7 @@ namespace TG.CarParkEsher.Booking
 {
     public sealed class BookingRepository : BaseRepository, IBookingRepository
     {
-        public BookingRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost) : base(logger, connectionOption, webHost)
+        public BookingRepository(ILoggingService logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost) : base(logger, connectionOption, webHost)
         {
         }
         public Task<Result<List<CarParkEsherDetail>>> GetPermittedParkingSpaces(bool blueBadge, bool ev, bool hybrid, DateTime startDate, DateTime? endDate, CancellationToken cancellationToken)
@@ -242,7 +242,7 @@ namespace TG.CarParkEsher.Booking
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving account for username");
+                _logger.LogInfo( "Error retrieving account for username", ex);
                 return Result.Failure<DatabaseVerificationsFlags>($"{ex.Message}.{ex.InnerException?.Message}");
             }
             return Result.Success<DatabaseVerificationsFlags>(databaseVerificationsFlags);
@@ -351,7 +351,7 @@ namespace TG.CarParkEsher.Booking
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while updating days of week.");
+                _logger.LogInfo( "An error occurred while updating days of week.", ex);
                 return false;
             }
         }

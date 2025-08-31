@@ -4,13 +4,13 @@ using Microsoft.Extensions.Options;
 
 namespace TG.CarParkEsher.Booking
 {
-    public abstract class BaseRepository
+    public abstract class BaseRepository : IBaseRepository
     {
-        protected readonly ILogger<BaseRepository> _logger;
+        protected readonly ILoggingService _logger;
         private readonly IOptionsMonitor<ConnectionOption> _connectionOption;
         private readonly IWebHostEnvironment _env;
 
-        protected BaseRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost)
+        protected BaseRepository(ILoggingService logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _connectionOption = connectionOption ?? throw new ArgumentNullException(nameof(connectionOption));
@@ -31,7 +31,7 @@ namespace TG.CarParkEsher.Booking
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                _logger.LogError("Connection string is not configured.");
+                _logger.LogInfo("Connection string is not configured.");
                 throw new InvalidOperationException("Connection string is not configured.");
                 
             }
@@ -40,20 +40,7 @@ namespace TG.CarParkEsher.Booking
           
             return connection;
         }
-        static string GetRootDirectory()
-        {
-            var d = Directory.GetCurrentDirectory();
-            while (!File.Exists(Path.Combine(d, "CarParkEsher.db")))
-            {
-                d = Path.GetDirectoryName(d);
-            }
 
-            return d;
-        }
-        private  string GetFilePath(IWebHostEnvironment env, string fileName)
-        {
-            // Combine the content root path with the file name
-            return Path.Combine(env.ContentRootPath, fileName);
-        }
+        SqliteConnection IBaseRepository.GetConnection() => throw new NotImplementedException();
     }
 }

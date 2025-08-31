@@ -6,7 +6,7 @@ namespace TG.CarParkEsher.Booking
 {
     public sealed class CalenderRepository : BaseRepository, ICalenderRepository
     {
-        public CalenderRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost) : base(logger, connectionOption, webHost)
+        public CalenderRepository(ILoggingService logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost) : base(logger, connectionOption, webHost)
         {
         }
         public async Task<Result<bool>> SeedDaysOfWeekTable(HashSet<CarParkEsherDayInfo> esherCarParkDayInfos, CancellationToken cancellationToken)

@@ -8,6 +8,7 @@ namespace TG.CarParkEsher.Booking
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+        services.AddSingleton<ILoggingService, LoggingService>();
             services.AddScoped<ICalenderService, CalenderService>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IAccountService, AccountService>();

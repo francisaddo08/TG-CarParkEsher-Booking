@@ -2,13 +2,12 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using TG.CarParkEsher.Booking;
-using TG.CarParkEsher.Booking.Controllers;
 
 namespace TG.CarParkEsher.Test.Controller
 {
     public class BookingControllerTest
     {
-        private  IBookingService _bookingService;
+        private IBookingService _bookingService;
         private readonly ILogger<BookingController> _logger;
 
         public BookingControllerTest()
@@ -26,14 +25,14 @@ namespace TG.CarParkEsher.Test.Controller
             _logger = A.Fake<ILogger<BookingController>>();
         }
         [Fact]
-        public void BookingController_CreateBookingAsync_Returns()
+        public void BookingController_CreateBookingAsync_ReturnsOk()
         {
             // Arrange
             var requestDto = new EsherCarParkBookingRequestDto() { DateBooked = DateTime.Now, ParkingSpaceId = 1, ParkingStructureId = 1 };
             var cancellationToken = new CancellationTokenSource().Token;
             var r = A.Fake<IBookingRepository>();
             var bs = new BookingService(r, A.Fake<Microsoft.AspNetCore.Http.IHttpContextAccessor>());
-           
+
 
             var controller = new BookingController(_logger, bs);
 
@@ -42,6 +41,7 @@ namespace TG.CarParkEsher.Test.Controller
 
             // Assert
             result.Should().NotBeNull();
+            //result.Should().BeOfType<Microsoft.AspNetCore.Mvc.ActionResult<EsherCarParkBookingResponseDto>>();
         }
     }
 }

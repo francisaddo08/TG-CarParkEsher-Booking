@@ -6,7 +6,7 @@ namespace TG.CarParkEsher.Booking
 {
     public class AccountRepository : BaseRepository, IAccountRepository
     {
-        public AccountRepository(ILogger<BaseRepository> logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost) : base(logger, connectionOption, webHost)
+        public AccountRepository(ILoggingService logger, IOptionsMonitor<ConnectionOption> connectionOption, IWebHostEnvironment webHost) : base(logger, connectionOption, webHost)
         {
         }
         public async Task<Result<bool>> GetAccountByContactIdAsync(int contactId, CancellationToken cancellationToken)
@@ -47,7 +47,7 @@ namespace TG.CarParkEsher.Booking
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving account for username");
+                _logger.LogInfo("Error retrieving account for username", ex);
                 return Result.Failure<bool>($"{ex.Message}.{ex.InnerException?.Message}");
             }
             return Result.Success<bool>(isFound);
@@ -117,7 +117,7 @@ namespace TG.CarParkEsher.Booking
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving account for username {Username}", username);
+                _logger.LogInfo("Error retrieving account for username {Username}", ex, username);
                 return  Result.Failure<CarParkEsherAccount?>($"{ex.Message}.{ex.InnerException?.Message}");
             }
             if (carParkEsherAccount == null)
@@ -194,7 +194,7 @@ namespace TG.CarParkEsher.Booking
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating account for ContactId {ContactId}", carParkEsherAccountValue.ContactId);
+                _logger.LogInfo("Error creating account for ContactId {ContactId}", ex, carParkEsherAccountValue.ContactId);
                 return Result.Failure<CarParkEsherAccount?>($"{ex.Message}.{ex.InnerException?.Message}");
             }
             if (carParkEsherAccount == null)
@@ -250,7 +250,7 @@ namespace TG.CarParkEsher.Booking
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving account for {FirstName} {LastName} with EmployeeId {EmployeeId}", firstName, lastName, emplyeeId);
+                _logger.LogInfo( "Error retrieving account for {FirstName} {LastName} with EmployeeId {EmployeeId}",ex, firstName, lastName, emplyeeId);
                 return Result.Failure<CarParkEsherEmployeeContact>("An error occurred while retrieving the account.");
             }
             if (contact == null)

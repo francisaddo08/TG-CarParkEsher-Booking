@@ -1,7 +1,7 @@
 ﻿        using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TG.CarParkEsher.Booking.Controllers
+namespace TG.CarParkEsher.Booking
 {
     [Tags("Booking")]
     [Route("api/v1-0/tg")]
@@ -43,6 +43,10 @@ namespace TG.CarParkEsher.Booking.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError, bookingresult.Result);
                 }
                 return StatusCode(StatusCodes.Status406NotAcceptable, bookingresult.Result);
+            }
+            if ( bookingresult.IsSuccess && !bookingresult.Result.Any())
+            {
+                return StatusCode(StatusCodes.Status404NotFound, bookingresult.Result);
             }
             return Ok(bookingresult.Result);
         }
