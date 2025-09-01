@@ -1,8 +1,11 @@
-﻿namespace TG.CarParkEsher.Booking
+﻿using CSharpFunctionalExtensions;
+
+namespace TG.CarParkEsher.Booking
 {
     public interface IBookingService
     {
-        public Task<ContextResult<EsherCarParkBookingResponseDto>> CreateBookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken);
-        Task<ContextResult<List<EsherCarParkAvaliableBayResponseDto>>> GetAllAvaliableBaysAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken);
+        public Task<ContextResult<EsherCarParkBookingResponseDto>> BookParkingSpaceAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken);
+        Task<ContextResult<List<EsherCarParkAvaliableBayResponseDto>>> GetAllAvaliableParkingSpacesAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken);
+     
     }
 }

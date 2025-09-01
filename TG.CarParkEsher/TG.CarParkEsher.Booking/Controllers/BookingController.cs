@@ -17,9 +17,9 @@ namespace TG.CarParkEsher.Booking
             _bookingService = bookingService ?? throw new ArgumentNullException(nameof(bookingService));
         }
         [HttpPost("booking/create")]
-        public async Task<ActionResult<EsherCarParkBookingResponseDto>> CreateBookingAsync(EsherCarParkBookingRequestDto request, CancellationToken cancellationToken)
+        public async Task<ActionResult<EsherCarParkBookingResponseDto>> BookParkingSpaceAsync(EsherCarParkBookingRequestDto request, CancellationToken cancellationToken)
         {
-            var bookingresult = await _bookingService.CreateBookSlotAsync(request, cancellationToken);
+            var bookingresult = await _bookingService.BookParkingSpaceAsync(request, cancellationToken);
             if (bookingresult.IsFailure)
             {
                 if (bookingresult.IsServerError)
@@ -32,9 +32,9 @@ namespace TG.CarParkEsher.Booking
             return Ok(bookingresult.Result);
         }
         [HttpPost("booking/avaliable-parkingspaces")]
-        public async Task<ActionResult<EsherCarParkBookingResponseDto>> GetAvaliableBaysAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
+        public async Task<ActionResult<EsherCarParkBookingResponseDto>> GetAvaliableParkingSpacesAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
         {
-            var bookingresult = await _bookingService.GetAllAvaliableBaysAsync(request, cancellationToken);
+            var bookingresult = await _bookingService.GetAllAvaliableParkingSpacesAsync(request, cancellationToken);
             if (bookingresult.IsFailure)
             {
                 if (bookingresult.IsServerError)

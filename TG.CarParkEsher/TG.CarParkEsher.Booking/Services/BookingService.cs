@@ -8,12 +8,13 @@ namespace TG.CarParkEsher.Booking
         private readonly IBookingRepository _bookingRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly int _defaultParkingStructureId = 1;
+
         public BookingService(IBookingRepository bookingRepository, IHttpContextAccessor httpContextAccessor)
         {
             _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
-        public async Task<ContextResult<List<EsherCarParkAvaliableBayResponseDto>>> GetAllAvaliableBaysAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
+        public async Task<ContextResult<List<EsherCarParkAvaliableBayResponseDto>>> GetAllAvaliableParkingSpacesAsync(EsherCarParkAvaliableBayRequestDto request, CancellationToken cancellationToken)
         {
             var bookings = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Bookings)?.Value;
             var bookingsList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CarParkEsherBooking>>(bookings ?? "[]");
@@ -30,7 +31,7 @@ namespace TG.CarParkEsher.Booking
             esherCarParkAvaliableBayResponse.ParkingSpaces = avaliableParkingSpaces.Value.Select(p => new EsherCarParkAvaliableBayDetailDto(p.ParkingSpaceId, p.DateAvaliable, p.Day, p.VehicleType,p.ColourCode)  ).ToList();
             return ContextResult<List<EsherCarParkAvaliableBayResponseDto>>.Success(new List<EsherCarParkAvaliableBayResponseDto> { esherCarParkAvaliableBayResponse });
         }
-        public async Task<ContextResult<EsherCarParkBookingResponseDto>> CreateBookSlotAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken)
+        public async Task<ContextResult<EsherCarParkBookingResponseDto>> BookParkingSpaceAsync(EsherCarParkBookingRequestDto bookingRequest, CancellationToken cancellationToken)
         {
             var esherCarParkBookingResponse = EsherCarParkBookingResponseDto.Create(bookingRequest);
             if (!esherCarParkBookingResponse.Valid)
@@ -138,4 +139,5 @@ namespace TG.CarParkEsher.Booking
 
 
     }
+ 
 }
