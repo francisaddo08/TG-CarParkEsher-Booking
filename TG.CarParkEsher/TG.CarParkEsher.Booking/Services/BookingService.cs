@@ -53,17 +53,17 @@ namespace TG.CarParkEsher.Booking
             var hybrid = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == UserClaimTypes.Hybrid)?.Value == "true";
 
             // var permitedBay = await _bookingRepository.GetPermittedParkingSpaces( );
-            var bayResult = await _bookingRepository.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId, bookingRequest.DateBooked, blueBadge, ev, hybrid, cancellationToken);
-            if (bayResult.IsFailure)
+            var parkingSpaceResult = await _bookingRepository.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId, bookingRequest.DateBooked, blueBadge, ev, hybrid, cancellationToken);
+            if (parkingSpaceResult.IsFailure)
             {
                 var errors = new List<ErrorDto>()
                 {
-                  new ErrorDto { ErrorID = "InvalidParkingSpace", ErrorDetail = bayResult.Error }
+                  new ErrorDto { ErrorID = "InvalidParkingSpace", ErrorDetail = parkingSpaceResult.Error }
                 };
                 esherCarParkBookingResponse.SetValidation(false, errors);
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
             }
-            if (!bayResult.Value.IsParkingSpaceAvailable)
+            if (!parkingSpaceResult.Value.IsParkingSpaceAvailable)
             {
                 var errors = new List<ErrorDto>()
                 {
@@ -73,7 +73,7 @@ namespace TG.CarParkEsher.Booking
                 return ContextResult<EsherCarParkBookingResponseDto>.Failure(esherCarParkBookingResponse);
 
             }
-            if (bayResult.Value.IsBlueBadgeValid && !bayResult.Value.AvaliableBlueBadgeBays.Contains(bookingRequest.ParkingSpaceId))
+            if (parkingSpaceResult.Value.IsBlueBadgeValid && !parkingSpaceResult.Value.AvaliableBlueBadgeParkingSpace.Contains(bookingRequest.ParkingSpaceId))
             {
                 var errors = new List<ErrorDto>()
                 {
@@ -84,7 +84,7 @@ namespace TG.CarParkEsher.Booking
 
             }
 
-            if (bayResult.Value.IsEvValid && !bayResult.Value.AvaliableEvBays.Contains(bookingRequest.ParkingSpaceId))
+            if (parkingSpaceResult.Value.IsEvValid && !parkingSpaceResult.Value.AvaliableEvParkingSpace.Contains(bookingRequest.ParkingSpaceId))
             {
                 var errors = new List<ErrorDto>()
                 {

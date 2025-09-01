@@ -179,8 +179,8 @@ namespace TG.CarParkEsher.Booking
 
                                     var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
 
-                                    databaseVerificationsFlags.AvaliableBlueBadgeBays.Add(id);
-                                    databaseVerificationsFlags.IsBlueBadgeValid = databaseVerificationsFlags.AvaliableBlueBadgeBays.Any() ? true : false;
+                                    databaseVerificationsFlags.AvaliableBlueBadgeParkingSpace.Add(id);
+                                    databaseVerificationsFlags.IsBlueBadgeValid = databaseVerificationsFlags.AvaliableBlueBadgeParkingSpace.Any() ? true : false;
                                 }
                             }
                         }
@@ -197,8 +197,8 @@ namespace TG.CarParkEsher.Booking
 
                                     var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
 
-                                    databaseVerificationsFlags.AvaliableEvBays.Add(id);
-                                    databaseVerificationsFlags.IsEvValid = databaseVerificationsFlags.AvaliableBlueBadgeBays.Any() ? true : false;
+                                    databaseVerificationsFlags.AvaliableEvParkingSpace.Add(id);
+                                    databaseVerificationsFlags.IsEvValid = databaseVerificationsFlags.AvaliableBlueBadgeParkingSpace.Any() ? true : false;
                                 }
                             }
                         }
@@ -215,8 +215,8 @@ namespace TG.CarParkEsher.Booking
 
                                     var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
 
-                                    databaseVerificationsFlags.AvaliableStandardBays.Add(id);
-                                    databaseVerificationsFlags.IsEvValid = databaseVerificationsFlags.AvaliableBlueBadgeBays.Any() ? true : false;
+                                    databaseVerificationsFlags.AvaliableStandardParkingSpace.Add(id);
+                                    databaseVerificationsFlags.IsEvValid = databaseVerificationsFlags.AvaliableBlueBadgeParkingSpace.Any() ? true : false;
                                 }
                             }
                         }
@@ -230,8 +230,8 @@ namespace TG.CarParkEsher.Booking
                                 while (await reader.ReadAsync(cancellationToken))
                                 {
                                     var id = reader.GetInt32(reader.GetOrdinal("parkingspaceid"));
-                                    databaseVerificationsFlags.AvaliableStandardBays.Add(id);
-                                    databaseVerificationsFlags.IsEvValid = databaseVerificationsFlags.AvaliableBlueBadgeBays.Any() ? true : false;
+                                    databaseVerificationsFlags.AvaliableStandardParkingSpace.Add(id);
+                                    databaseVerificationsFlags.IsEvValid = databaseVerificationsFlags.AvaliableBlueBadgeParkingSpace.Any() ? true : false;
                                 }
                             }
                         }
