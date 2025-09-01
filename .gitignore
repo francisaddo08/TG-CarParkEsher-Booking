@@ -417,3 +417,4 @@ FodyWeavers.xsd
 *.msm
 *.msp
 /TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj
+/TG.CarParkEsher/TG.CarParkEsher.Moq.Test/BookingServiceTest.cs
