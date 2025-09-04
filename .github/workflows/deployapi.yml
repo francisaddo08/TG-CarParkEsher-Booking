@@ -4,8 +4,9 @@ on:
   workflow_dispatch: # allows manual triggering of the workflow
 
 jobs:
+  #build job
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,6 +21,10 @@ jobs:
 
       - name: Build the project
         run: dotnet build  ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release --no-restore
+        #publish job
+      - name: Publish the project
+        run: dotnet publish ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release  --output ./publish  
+    
 
  
 
