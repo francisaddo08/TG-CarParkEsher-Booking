@@ -16,10 +16,10 @@ jobs:
           dotnet-version: '8.0.x' # specify the .NET version
 
       - name: Restore dependencies
-        run: dotnet restore ./TG.CarParkEsher\TG.CarParkEsher.Booking.csproj
+        run: dotnet restore ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj
 
       - name: Build the project
-        run: dotnet build  ./TG.CarParkEsher\TG.CarParkEsher.Booking.csproj --configuration Release --no-restore
+        run: dotnet build  ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release --no-restore
 
  
 
