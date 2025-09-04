@@ -1,5 +1,5 @@
 #github action to deployy api to azure app service
-name: Deploy API to Azure App Service
+name: Deploy API to Smart ASP.NET.NET Hosting
 on:
   workflow_dispatch: # allows manual triggering of the workflow
 
