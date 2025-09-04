@@ -24,7 +24,7 @@ namespace TG.CarParkEsher.Moq.Test
             {
                 DateBooked = DateTime.UtcNow.AddDays(1),
                 ParkingSpaceId = 1,
-                ParkingStructureId = 1
+                ParkingStructureId = 1 
             };
             var bookingResponse = EsherCarParkBookingResponseDto.Create(bookingRequest);
 
@@ -57,7 +57,7 @@ namespace TG.CarParkEsher.Moq.Test
             _bookingRepositoryMock.Setup(repo => repo.CheckParkingSpaceByIdAsync(bookingRequest.ParkingSpaceId, bookingRequest.DateBooked, blueBadge, ev, hybrid, cancellationToken))
                 .ReturnsAsync(Result.Success(new DatabaseVerificationsFlags
                 {
-                    AvaliableBlueBadgeParkingSpace = new List<int>(){ },
+                    AvaliableBlueBadgeParkingSpace = new List<int>(){ 1},
                     AvaliableEvParkingSpace = new List<int>() { },
                     AvaliableHybridParkingSpace = new List<int>() { },
                     AvaliableStandardParkingSpace = new List<int>() { },
@@ -66,18 +66,15 @@ namespace TG.CarParkEsher.Moq.Test
                 }));
                 
             var createdBooking = CarParkEsherBooking.Create(userId, bookingRequest.DateBooked, bookingRequest.ParkingSpaceId, bookingRequest.ParkingStructureId);
-            if (createdBooking.IsFailure)
-            {
-                throw new Exception("Failed to create booking for test setup: " + createdBooking.Error);
-            }
+         
             _bookingRepositoryMock.Setup(repo =>  repo.CreateBookingAsync(It.IsAny<CarParkEsherBooking>(), cancellationToken))
                 .ReturnsAsync(Result.Success(createdBooking.Value));
 
             // Create a temporary booking to use in the Act section
-            var temp = new CarParkEsherBooking(1, 1, DateTime.UtcNow, "Monday", 1, 1);
+            var temp = CarParkEsherBooking.Create(1,  DateTime.UtcNow,  1, 1);
             //Act
           
-
+            var result = await _sut.BookParkingSpaceAsync(bookingRequest, cancellationToken);
             //Assert
             // Assert.(ContextResult<EsherCarParkBookingResponseDto>.Success(bookingResponse));
         }

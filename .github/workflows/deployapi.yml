@@ -1,0 +1,27 @@
+#github action to deployy api to azure app service
+name: Deploy API to Azure App Service
+on:
+  workflow_dispatch: # allows manual triggering of the workflow
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x' # specify the .NET version
+
+      - name: Restore dependencies
+        run: dotnet restore ./TG.CarParkEsher\TG.CarParkEsher.Booking.csproj
+
+      - name: Build the project
+        run: dotnet build  ./TG.CarParkEsher\TG.CarParkEsher.Booking.csproj --configuration Release --no-restore
+
+ 
+
+
+ 
