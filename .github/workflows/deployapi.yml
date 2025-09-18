@@ -20,7 +20,9 @@ jobs:
         run: dotnet restore ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj
 
       - name: Build the project
-        run: dotnet build  ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release --no-restore
+        run: | 
+          dir
+          dotnet build  ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release --no-restore
         #publish job
       - name: Publish the project
         run: dotnet publish ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release  --output ./publish  
