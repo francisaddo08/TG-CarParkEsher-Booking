@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: 'Check directory'
         run: |
-         dir  /${{ github.workspace }}
+         dir 
          echo "The current directory is: $PWD"  
 
       - name: Checkout code
@@ -31,6 +31,7 @@ jobs:
           dir
           dotnet build  ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release --no-restore
           dir
+            dir  /${{ github.workspace }}
         #publish job
       - name: Publish the project
         run: dotnet publish ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release  --output ./publish  
