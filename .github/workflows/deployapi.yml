@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: 'Check directory'
         run: |
-         dir  /d
+         dir  /${{ github.workspace }}
          echo "The current directory is: $PWD"  
 
       - name: Checkout code
