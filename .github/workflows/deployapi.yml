@@ -37,10 +37,7 @@ jobs:
         run: |
           
           dotnet publish ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release  --output ./publish  
-          dir
-          echo "The current directory is: $PWD"
-          echo "Contents of publish directory:"
-          dir ./publish
+       
       
 
  
