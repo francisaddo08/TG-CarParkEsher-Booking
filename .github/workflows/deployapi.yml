@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: 'Check directory'
         run: |
-         dir /s /b /ad
+         dir /s  /b 
       - name: Checkout code
         uses: actions/checkout@v4
 
