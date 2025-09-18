@@ -8,8 +8,13 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
+      - name: 'Check directory'
+        run: |
+         dir /s /b /ad
       - name: Checkout code
         uses: actions/checkout@v4
+
+        
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
@@ -23,6 +28,7 @@ jobs:
         run: | 
           dir
           dotnet build  ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release --no-restore
+          dir
         #publish job
       - name: Publish the project
         run: dotnet publish ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release  --output ./publish  
