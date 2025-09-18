@@ -38,6 +38,16 @@ jobs:
           dir
           dotnet publish ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release  --output ./publish  
           dir ./publish
+
+
+      - name: deploy application
+        uses: talunzhang/auto-web-deploy@v1.0.1
+        with:
+          website-name: 'ftaddo-002-site1'
+          server-computer-name: 'https://win8114.site4now.net:8172'
+          server-username: 'ftaddo-002'
+          server-password: 'As#rekwo@96'
+          source-path: ./publish
        
       
 
