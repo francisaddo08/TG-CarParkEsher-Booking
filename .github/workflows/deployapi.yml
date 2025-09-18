@@ -38,7 +38,7 @@ jobs:
           dir
           dotnet publish ./TG.CarParkEsher/TG.CarParkEsher.Booking/TG.CarParkEsher.Booking.csproj --configuration Release  --output ./publish  
           dir ./publish
-    
+          dir  ${{ github.workspace }}
 
  
 
