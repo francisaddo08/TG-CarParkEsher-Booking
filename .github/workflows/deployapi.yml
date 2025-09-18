@@ -10,7 +10,9 @@ jobs:
     steps:
       - name: 'Check directory'
         run: |
-         dir /s  /b 
+         dir ${GITHUB_WORKSPACE}
+         echo "The current directory is: $PWD"  
+         
       - name: Checkout code
         uses: actions/checkout@v4
 
