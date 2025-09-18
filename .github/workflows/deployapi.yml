@@ -47,7 +47,7 @@ jobs:
           server-computer-name: 'https://win8114.site4now.net:8172'
           server-username: 'ftaddo-002'
           server-password: 'As#rekwo@96'
-          source-path: /publish
+          source-path: 'D:\a\TG-CarParkEsher-Booking\TG-CarParkEsher-Booking\publish'
        
       
 
